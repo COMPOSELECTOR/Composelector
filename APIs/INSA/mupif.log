@@ -1,0 +1,34 @@
+2018-11-16 11:48:42 DEBUG:PyroUtil.py:171 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2018-11-16 11:48:42 DEBUG:PyroUtil.py:181 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.54 
+
+2018-11-16 11:48:42 INFO:PyroUtil.py:518 Located Job Manager Mupif.JobManager@INSA at: 172.30.0.151 44382 None None 
+
+2018-11-16 11:48:42 DEBUG:PyroUtil.py:242 Application Mupif.JobManager@INSA, found URI PYRO:obj_88645677485a4f5cb2db85fc8d7beedd@172.30.0.151:44382 on ('172.30.0.151', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fd03bf81898; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2018-11-16 11:48:42 INFO:PyroUtil.py:250 Connecting to application Mupif.JobManager@INSA with <Pyro4.core.Proxy at 0x7fd03bf81a90; not connected; for PYRO:obj_88645677485a4f5cb2db85fc8d7beedd@172.30.0.151:44382> 
+
+2018-11-16 11:48:42 DEBUG:PyroUtil.py:252 Connected to Mupif.JobManager.SimpleJobManager2 with the application Mupif.JobManager@INSA 
+
+2018-11-16 11:48:42 DEBUG:PyroUtil.py:553 Trying to connect to JobManager 
+
+2018-11-16 11:48:57 INFO:PyroUtil.py:571 Allocated job, returned record from jobManager:(1, '13@Mupif.JobManager@INSA', 9392) 
+
+2018-11-16 11:48:57 INFO:PyroUtil.py:586 Scenario: Connecting to 13@Mupif.JobManager@INSA 9392 
+
+2018-11-16 11:48:57 DEBUG:PyroUtil.py:242 Application 13@Mupif.JobManager@INSA, found URI PYRO:obj_87dac904089d429b9d7b8bc68801d4a8@172.30.0.151:9392 on ('172.30.0.151', 9392, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fd03bf81898; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2018-11-16 11:48:57 INFO:PyroUtil.py:250 Connecting to application 13@Mupif.JobManager@INSA with <Pyro4.core.Proxy at 0x7fd03bf81e80; not connected; for PYRO:obj_87dac904089d429b9d7b8bc68801d4a8@172.30.0.151:9392> 
+
+2018-11-16 11:48:57 DEBUG:PyroUtil.py:252 Connected to INSA_API with the application 13@Mupif.JobManager@INSA 
+
+2018-11-16 11:48:57 INFO:INSAWorkflow.py:46 Created INSA job 
+
+2018-11-16 11:48:57 INFO:INSAWorkflow.py:52 Working INSA solver on server INSA_API 
+
+2018-11-16 11:48:57 DEBUG:Workflow.py:91 Step 1: t=1 dt=1 
+
+2018-11-16 11:48:58 INFO:INSAWorkflow.py:95 Running INSA solver 
+
+2018-11-16 11:50:01 INFO:Application.py:331 RemoteApplication: Terminating jobManager job 13@Mupif.JobManager@INSA on Mupif.JobManager@INSA 
+
