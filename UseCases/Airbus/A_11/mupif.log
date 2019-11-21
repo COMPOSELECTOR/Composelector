@@ -1,0 +1,48 @@
+2019-11-21 11:01:07 INFO:A_11.py:35 Setting Workflow basic metadata 
+
+2019-11-21 11:01:07 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2019-11-21 11:01:07 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2019-11-21 11:01:07 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2019-11-21 11:01:07 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_9b88d542946440f2816a2705069d69b9@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fc11842ea20; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2019-11-21 11:01:07 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fc11842eef0; not connected; for PYRO:obj_9b88d542946440f2816a2705069d69b9@172.30.0.112:44382> 
+
+2019-11-21 11:01:08 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+
+2019-11-21 11:01:08 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2019-11-21 11:01:09 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '20@eX_DigimatMF_JobManager', 9019) 
+
+2019-11-21 11:01:09 INFO:PyroUtil.py:638 Scenario: Connecting to 20@eX_DigimatMF_JobManager 9019 
+
+2019-11-21 11:01:09 DEBUG:PyroUtil.py:252 Application 20@eX_DigimatMF_JobManager, found URI PYRO:obj_2b012f8a1b1d4f58a80e664e3248d85d@172.30.0.112:9019 on ('172.30.0.112', 9019, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fc11842ea20; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2019-11-21 11:01:09 INFO:PyroUtil.py:260 Connecting to application 20@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fc118442e80; not connected; for PYRO:obj_2b012f8a1b1d4f58a80e664e3248d85d@172.30.0.112:9019> 
+
+2019-11-21 11:01:09 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 20@eX_DigimatMF_JobManager 
+
+2019-11-21 11:01:09 INFO:A_11.py:102 Created digimat job 
+
+2019-11-21 11:01:09 INFO:A_11.py:108 Working lammps solver on server Model 
+
+2019-11-21 11:01:09 INFO:A_11.py:110 Working digimat solver on server DigimatApplication 
+
+2019-11-21 11:01:09 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2019-11-21 11:01:19 INFO:A_11.py:203 Running digimat 
+
+2019-11-21 11:01:21 INFO:Model.py:496 Terminating model 
+
+2019-11-21 11:01:21 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 20@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+
+2019-11-21 11:01:21 INFO:Model.py:496 Terminating model 
+
+2019-11-21 11:01:21 INFO:Model.py:496 Terminating model 
+
+2019-11-21 11:01:21 INFO:Model.py:496 Terminating model 
+
+2019-11-21 11:01:21 INFO:A_11.py:348 Process complete 
+

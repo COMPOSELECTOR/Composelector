@@ -1,0 +1,24 @@
+2019-11-21 11:01:14 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2019-11-21 11:01:14 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fd8c0e55be0; not connected; for PYRO:obj_9b88d542946440f2816a2705069d69b9@172.30.0.112:44382> 
+
+2019-11-21 11:01:15 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '21@eX_DigimatMF_JobManager', 9020) 
+
+2019-11-21 11:01:15 INFO:PyroUtil.py:638 Scenario: Connecting to 21@eX_DigimatMF_JobManager 9020 
+
+2019-11-21 11:01:15 INFO:PyroUtil.py:260 Connecting to application 21@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fd8c0e68908; not connected; for PYRO:obj_42898edfb47148668a96fa57a3cd371e@172.30.0.112:9020> 
+
+2019-11-21 11:01:15 INFO:A_12.py:65 Created Digimiat job 
+
+2019-11-21 11:01:15 INFO:A_12.py:71 Working application 1 on server DigimatApplication 
+
+2019-11-21 11:01:15 INFO:A_12.py:117 Running Digimat 
+
+2019-11-21 11:01:17 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 21@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+
+2019-11-21 11:01:17 INFO:Model.py:496 Terminating model 
+
+2019-11-21 11:01:17 INFO:Model.py:496 Terminating model 
+
+2019-11-21 11:01:17 INFO:A_12.py:212 Process complete 
+
