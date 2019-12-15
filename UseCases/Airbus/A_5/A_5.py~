@@ -16,7 +16,7 @@ nshost = '172.30.0.1'
 nsport = 9090
 hkey = 'mupif-secret-key'
 digimatJobManName='eX_DigimatMF_JobManager'
-abaqusJobManName='Abaqus@Mupif.LIST'
+mul2JobManName='MUL2.JobManager@UseCase1'
 
 class Airbus_Workflow_2(Workflow.Workflow):
    

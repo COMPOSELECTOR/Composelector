@@ -1,0 +1,401 @@
+import sys
+sys.path.extend(['/home/nitram/Documents/work/MUPIF/mupif'])
+from mupif import *
+from mupif import dataID, PropertyID, Property, ValueType
+import mupif
+import argparse
+import Pyro4
+import os
+import shutil
+import glob
+import logging
+log = logging.getLogger()
+import time as timeT
+import mupif.Physics.PhysicalQuantities as PQ
+debug = True
+
+
+
+if not debug:
+    import ComposelectorSimulationTools.MIUtilities as miu
+
+log = logging.getLogger()
+
+nshost = '172.30.0.1'
+nsport = 9090
+hkey = 'mupif-secret-key'
+JobManName2='Abaqus@Mupif.LIST'
+
+
+class Airbus_Workflow_4(Workflow.Workflow):
+   
+    def __init__(self, metaData={}):
+        """
+        Initializes the workflow. As the workflow is non-stationary, we allocate individual 
+        applications and store them within a class.
+        """
+
+        log.info('Setting Workflow basic metadata')
+        MD = {
+####  Model information #### 
+            'Name': 'Airbus Case',
+            'ID': '4',
+            'Description': 'Simulation of buckling load',
+            'Model_refs_ID': ['xy', 'xy'],
+############################
+
+####  Workflow input definition #### 
+            'Inputs': [
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus1', 'Name': 'E_1',
+                 'Description': 'Young modulus 1', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus2', 'Name': 'E_2',
+                 'Description': 'Young modulus 2', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus3', 'Name': 'E_3',
+                 'Description': 'Young modulus 3', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_PoissonRatio12', 'Name': 'nu_12',
+                 'Description': 'Poisson\'s ration 12', 'Units': 'none', 'Required': True},                
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_PoissonRatio13', 'Name': 'nu_13',
+                 'Description': 'Poisson\'s ration 13', 'Units': 'none', 'Required': True},                
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_PoissonRatio23', 'Name': 'nu_23',
+                 'Description': 'Poisson\'s ration 23', 'Units': 'none', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus12', 'Name': 'G_12',
+                 'Description': 'Shear modulus 12', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus13', 'Name': 'G_13',
+                 'Description': 'Shear modulus 13', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus23', 'Name': 'G_23',
+                 'Description': 'Shear modulus 23', 'Units': 'MPa', 'Required': True},                
+            ],
+############################
+
+#### Workflow output definition #### 
+            'Outputs': [
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CriticalLoadLevel', 'Name': 'F_crit',
+                 'Description': 'Buckling load of the structure', 'Units': 'kN'},
+#                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_Volume',  'Name': 'volume',
+#                 'Description': 'volume of the structure', 'Units': 'mm**3', 'Required': True},
+#                Volume calculation not possible in pure buckling analysis !!!!
+############################
+
+            ]
+        }
+        super(Airbus_Workflow_4, self).__init__(metaData=MD)
+        self.updateMetadata(metaData)        
+
+        #list of recognized input porperty IDs
+        self.myInputPropIDs = [PropertyID.PID_YoungModulus1,PropertyID.PID_YoungModulus2, PropertyID.PID_YoungModulus3, PropertyID.PID_PoissonRatio12, PropertyID.PID_PoissonRatio13,PropertyID.PID_PoissonRatio23, PropertyID.PID_ShearModulus12, PropertyID.PID_ShearModulus13, PropertyID.PID_ShearModulus23]     
+        # list of compulsory IDs
+        self.myCompulsoryPropIDs = self.myInputPropIDs
+        #list of recognized output property IDs
+        self.myOutPropIDs =  [PropertyID.PID_CriticalLoadLevel]
+
+        #dictionary of input properties (values)
+        self.myInputProps = {}
+        #dictionary of output properties (values)
+        self.myOutProps = {}
+        
+       
+        self.myMacroOutPropIDs = []
+        for data in self.getMetadata("Outputs"):
+            self.myMacroOutPropIDs.append(eval(data['Type_ID']))
+        
+        self.myMacroOutProps = {}       
+
+        self.abaqusSolver = None
+
+
+
+    def initialize(self, file='', workdir='', targetTime=PQ.PhysicalQuantity(0., 's'), metaData={}, validateMetaData=True, **kwargs):
+
+        #locate nameserver
+        ns = PyroUtil.connectNameServer(nshost, nsport, hkey)
+
+# initialisze abaqus application 
+        #connect to JobManager running on (remote) server
+        self.abaqusJobMan = PyroUtil.connectJobManager(ns, abaqusJobManName,hkey)
+
+        #allocate the Abaqus remote instance
+        try:
+            self.abaqusSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.abaqusJobMan, None, hkey, sshContext=None)       
+            log.info('Created Abaqus job')
+        except Exception as e:
+            log.exception(e)
+        else:
+            if ((self.abaqusSolver is not None)):
+                abaqusSolverSignature=self.abaqusSolver.getApplicationSignature()
+                log.info("Working Abaqus solver on server " + abaqusSolverSignature)
+            else:
+                log.debug("Connection to server failed, exiting")
+       
+
+
+        super(Airbus_Workflow_4, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
+
+        # To be sure update only required passed metadata in models
+        passingMD = {
+            'Execution': {
+                'ID': self.getMetadata('Execution.ID'),
+                'Use_case_ID': self.getMetadata('Execution.Use_case_ID'),
+                'Task_ID': self.getMetadata('Execution.Task_ID')
+            }
+        }
+        
+
+    def setProperty(self, property, objectID=0):
+        propID = property.getPropertyID()
+        if (propID in self.myInputPropIDs):
+            self.myInputProps[propID]=property
+        else:
+            raise APIError.APIError('Unknown property ID')
+
+    def getProperty(self, propID, time, objectID=0):
+        if (propID in self.myOutPropIDs):
+            return self.myOutProps[propID]
+        else:
+            raise APIError.APIError ('Unknown property ID', propID)   
+
+    def solveStep(self, istep, stageID=0, runInBackground=False):
+
+        # check if compulsory input properties exist
+        for cID in self.myCompulsoryPropIDs:
+            if cID not in self.myInputProps:
+                raise APIError.APIError (self.getApplicationSignature(), ' Missing compulsory property ', cID)   
+
+        # set material properties for Abaqus 
+        try:
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_YoungModulus1])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_YoungModulus2])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_YoungModulus3])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_PoissonRatio12])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_PoissonRatio13])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_PoissonRatio23])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_ShearModulus12])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_ShearModulus13])
+            self.abaqusSolver.setProperty(self.myInputProps[PropertyID.PID_ShearModulus23])
+        except Exception as err:
+            print ("Setting Abaqus params failed: " + repr(err));
+            self.terminate()
+
+        try:
+            # solve Abaqus part
+            log.info("Running Abaqus")
+            self.abaqusSolver.solveStep(None)
+
+            ## get KPIs from Abaqus
+            # KPIs have to be extracted here because default self.solve terminates application instance
+            print('*** Get KPIs:',self.myMacroOutPropIDs)
+            for propID in self.myMacroOutPropIDs:
+                try :
+                    prop = self.abaqusSolver.getProperty(propID)
+                    self.myMacroOutProps[propID] = prop
+                    print('KPI',prop)
+                except Exception as e:
+                    log.error("ABAQUS KPI retrieval failed", propID)
+                    print(str(e))
+               
+            print('*** KPIs:',self.myMacroOutProps)
+            print('WORKFLOW: GOT ALL KPIs')
+
+        except Exception as err:
+            print ("Error:" + repr(err))
+            self.terminate()
+
+
+
+    def getCriticalTimeStep(self):
+        # determine critical time step
+        return PQ.PhysicalQuantity(1.0, 's')
+
+    def terminate(self):
+        self.abaqusSolver.terminate()
+        super(Airbus_Workflow_4, self).terminate()
+
+    def getApplicationSignature(self):
+        return "Composelector workflow 1.0"
+
+    def getAPIVersion(self):
+        return "1.0"
+
+def workflow(inputGUID, execGUID):
+    """
+    Workflow for Airbus use case.
+    Calculation of KPI buckling load from data base material properties
+    """
+    # Define execution details to export
+    if not debug:
+        execPropsToExp = {"ID": "",
+                          "Use case ID": ""}
+        
+        # Export execution information from database
+        ExportedExecInfo = miu.ExportData("MI_Composelector", "Modelling tasks workflows executions", execGUID,
+                                          execPropsToExp)
+        execID = ExportedExecInfo["ID"]
+        useCaseID = ExportedExecInfo["Use case ID"]
+        
+        # Define properties:units to export
+        propsToExp = {"Axial Young's modulus": "MPa",
+                      "In-plane Young's modulus": "MPa",
+                      "E3": "MPa",
+                      "In-plane shear modulus": "MPa",
+                      "Transverse shear modulus": "MPa",
+                      "G23": "MPa",
+                      "In-plane Poisson's ratio": "",
+                      "Transverse Poisson's ratio": "",
+                      "NU23": ""
+        }
+        
+        # Export data from database
+        ExportedData = miu.ExportData("MI_Composelector", "Inputs-Outputs", inputGUID, propsToExp, miu.unitSystems.METRIC)
+        
+        # Assign exported properties to variables
+        E1 = ExportedData["Axial Young's modulus"]
+        E2 = ExportedData["In-plane Young's modulus"]
+        E3 = ExportedData["E3"]
+        G12 = ExportedData["In-plane shear modulus"]
+        G13 = ExportedData["Transverse shear modulus"]
+        G23 = ExportedData["G23"]
+        nu12 = ExportedData["In-plane Poisson's ratio"]
+        nu13 = ExportedData["Transverse Poisson's ratio"]
+        nu23 = ExportedData["NU23"]
+    else:
+        E1 = 10
+        E2 = 10
+        E3 = 5
+        G12 = 3
+        G13 = 3
+        G23 = 3
+        nu12 = 0.2
+        nu13 = 0.3
+        nu23 = 0.1
+        
+####    define ABAQUS input file names ####
+        cfile1='abaqus_v6.env'
+        cfile2='composelector_Panel-v4d.inp'
+############################
+
+        try:
+            workflow = Airbus_Workflow_4()
+            workflowID = {
+                'Execution': {
+                    'ID': '1',
+                    'Use_case_ID': '1_1',
+                    'Task_ID': '1'
+                }
+            }
+            workflowMD = workflowID.copy()
+
+            workflow.initialize(targetTime=PQ.PhysicalQuantity(1., 's'), metaData=workflowMD)
+            print('WORKFLOW INITIALIZED')
+            # set workflow input data
+            # Submitting new material properties
+#            pE1 = workflow.setProperty(Property.ConstantProperty(E1, PropertyID.PID_YoungModulus1, ValueType.Scalar, 'MPa'))
+#            pE2 = workflow.setProperty(Property.ConstantProperty(E2, PropertyID.PID_YoungModulus2, ValueType.Scalar, 'MPa'))
+#            pE3 = workflow.setProperty(Property.ConstantProperty(E3, PropertyID.PID_YoungModulus3, ValueType.Scalar, 'MPa'))
+#           # pnu12 = workflow.setProperty(Property.ConstantProperty(nu12, PropertyID.PID_PoissonRatio12, ValueType.Scalar, PQ.getDimensionlessUnit()))
+#           # pnu13 = workflow.setProperty(Property.ConstantProperty(nu13, PropertyID.PID_PoissonRatio13, ValueType.Scalar, PQ.getDimensionlessUnit()))
+#           # pnu23 = workflow.setProperty(Property.ConstantProperty(nu23, PropertyID.PID_PoissonRatio23, ValueType.Scalar, PQ.getDimensionlessUnit()))
+#           pnu12 = workflow.setProperty(Property.ConstantProperty(nu12, PropertyID.PID_PoissonRatio12, ValueType.Scalar, 'none'))
+#           pnu13 = workflow.setProperty(Property.ConstantProperty(nu13, PropertyID.PID_PoissonRatio13, ValueType.Scalar, 'none'))
+#           pnu23 = workflow.setProperty(Property.ConstantProperty(nu23, PropertyID.PID_PoissonRatio23, ValueType.Scalar, 'none'))
+#           pG12 = workflow.setProperty(Property.ConstantProperty(G12, PropertyID.PID_ShearModulus12, ValueType.Scalar, 'MPa'))
+#           pG13 = workflow.setProperty(Property.ConstantProperty(G13, PropertyID.PID_ShearModulus13, ValueType.Scalar, 'MPa'))
+#           pG23 = workflow.setProperty(Property.ConstantProperty(G23, PropertyID.PID_ShearModulus23, ValueType.Scalar, 'MPa'))
+
+            workflow.setProperty(Property.ConstantProperty(E1, PropertyID.PID_YoungModulus1, ValueType.Scalar, 'MPa'))
+            workflow.setProperty(Property.ConstantProperty(E2, PropertyID.PID_YoungModulus2, ValueType.Scalar, 'MPa'))
+            workflow.setProperty(Property.ConstantProperty(E3, PropertyID.PID_YoungModulus3, ValueType.Scalar, 'MPa'))
+            workflow.setProperty(Property.ConstantProperty(nu12, PropertyID.PID_PoissonRatio12, ValueType.Scalar, 'none'))
+            workflow.setProperty(Property.ConstantProperty(nu13, PropertyID.PID_PoissonRatio13, ValueType.Scalar, 'none'))
+            workflow.setProperty(Property.ConstantProperty(nu23, PropertyID.PID_PoissonRatio23, ValueType.Scalar, 'none'))
+            workflow.setProperty(Property.ConstantProperty(G12, PropertyID.PID_ShearModulus12, ValueType.Scalar, 'MPa'))
+            workflow.setProperty(Property.ConstantProperty(G13, PropertyID.PID_ShearModulus13, ValueType.Scalar, 'MPa'))
+            workflow.setProperty(Property.ConstantProperty(G23, PropertyID.PID_ShearModulus23, ValueType.Scalar, 'MPa'))
+            
+            ###########################################################################################
+            ### START ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
+            # select input file location: True = application server, False: control script computer
+            filesend = False
+
+            # Define server path of input files
+            print('**** copy files to working directories')
+            if filesend:
+                basepath=os.path.abspath('..')
+                inpDir2 = os.path.join(basepath,'abaqusserver','inputFiles')
+            else:
+                inpDir2 = os.path.abspath('./inputFiles')
+
+            # identify input files
+            print("Identifying input files.")
+            workflow.file2 = glob.glob(os.path.join(inpDir2, cfile2))[0]
+            workflow.file2 = os.path.basename(workflow.file2)
+
+            try:
+                inpFiles2 = []
+                if filesend:
+                    inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile1)))
+                    inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile2)))
+                else:
+                    inpFiles2.append(cfile1)
+                    inpFiles2.append(cfile2)
+            except Exception as err:
+                print("Error:" + repr(err))
+        
+            # copy Abaqus input files to server work directories
+            print("Transferring input files to the work directory.")
+            if filesend:
+                print("$$$ Uploading input files from application server to workdir")
+                try:
+                    for inpFile in inpFiles2:
+                        shutil.copy(inpFile, workflow.abaqusJobMan.getJobWorkDir(workflow.abaqusSolver.getJobID()))
+                except Exception as err:
+                    print("Error:" + repr(err))
+            else:
+                print("$$$ Uploading input files from control computer to workdir")
+                log.info("Uploading input files to server")
+                try:
+                    for inpFile in inpFiles2:
+                        pf = workflow.abaqusJobMan.getPyroFile(workflow.abaqusSolver.getJobID(), inpFile, 'wb')
+                        PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, hkey)
+                except Exception as err:
+                    print("Error:" + repr(err))
+
+            ### END ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
+            #########################################################################################
+            print('FILES COPIED')
+
+# define metadata to be passed to ABAQUS solver
+            app2MD=workflowID.copy()
+            app2MD['Inputs']=workflow.getMetadata('Inputs').copy()
+            app2MD['Outputs']=workflow.getMetadata('Outputs').copy()
+############################
+
+# initialize abaqus solver
+            workflow.abaqusSolver.initialize(metaData=app2MD, file = workflow.file2, workdir = workflow.abaqusJobMan.getJobWorkDir(workflow.abaqusSolver.getJobID()))
+            print('SOLVER INITIALIZED')
+############################
+
+            # solve workflow
+            workflow.solve()
+            print('WORKFLOW SOLVED')
+            
+            # get workflow outputs
+            time = PQ.PhysicalQuantity(1.0, 's')
+            
+            workflow.terminate()
+            log.info("Process complete")
+            
+            if not debug:
+                # Importing output to database
+                ImportHelper = miu.Importer("MI_Composelector", "Inputs-Outputs", ["Inputs/Outputs"])
+                ImportHelper.CreateAttribute("Execution ID", execID, "")
+                ImportHelper.CreateAttribute("Buckling Load", buckLoad, "N")
+                return ImportHelper
+            
+        except APIError.APIError as err:
+            print ("Mupif API for Scenario error: " + repr(err))
+        except Exception as err:
+            print ("Error: " + repr(err))
+        except:
+            print ("Unknown error.")
+            
+if __name__=='__main__':
+    workflow(0,0)
