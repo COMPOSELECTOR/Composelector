@@ -9,17 +9,21 @@ import mupif.Physics.PhysicalQuantities as PQ
 
 debug = True
 
+
 if not debug:
     import ComposelectorSimulationTools.MIUtilities as miu
+    import ApplicationsConfigs.LAMMPS_v3 as lammps
+else:
+    import LAMMPS_v4 as lammps
 
 nshost = '172.30.0.1'
 nsport = 9090
 hkey = 'mupif-secret-key'
-digimatJobManName='eX_DigimatMF_JobManager'
-abaqusJobManName='Abaqus@Mupif.LIST'
+digimatJobManName = 'eX_DigimatMF_JobManager'
+vpsJobManName='ESI_VPS_Jobmanager'
 
-class Airbus_Workflow_2(Workflow.Workflow):
-   
+class Airbus_Workflow_14(Workflow.Workflow):
+
     def __init__(self, metaData={}):
         """
         Initializes the workflow. As the workflow is non-stationary, we allocate individual 
@@ -28,7 +32,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
         log.info('Setting Workflow basic metadata')
         MD = {
             'Name': 'Airbus Case',
-            'ID': '1_2_2',
+            'ID': 'A_14',
             'Description': 'Simulation of ',
             'Model_refs_ID': ['xy', 'xy'],
             'Inputs': [
@@ -63,7 +67,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
             ]
         }
 
-        super(Airbus_Workflow_2, self).__init__(metaData=MD)
+        super(Airbus_Workflow_14, self).__init__(metaData=MD)
         self.updateMetadata(metaData)        
 
         #list of recognized input porperty IDs
@@ -81,7 +85,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
 
         # solvers
         self.digimatSolver = None
-        self.mul2Solver = None
+        self.vpsSolver = None
         
 
 
@@ -91,28 +95,28 @@ class Airbus_Workflow_2(Workflow.Workflow):
         ns = PyroUtil.connectNameServer(nshost, nsport, hkey)
         #connect to digimat JobManager running on (remote) server
         self.digimatJobMan = PyroUtil.connectJobManager(ns, digimatJobManName,hkey)
-        #connect to mult2 JobManager running on (remote) server
-        self.mul2JobMan = PyroUtil.connectJobManager(ns, mul2JobManName,hkey)
+        #connect to vps JobManager running on (remote) server
+        self.vpsJobMan = PyroUtil.connectJobManager(ns, vpsJobManName,hkey)
         
 
         #allocate the Digimat remote instance
         try:
             self.digimatSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.digimatJobMan, None, hkey)
             log.info('Created digimat job')
-            self.mul2Solver = PyroUtil.allocateApplicationWithJobManager( ns, self.mul2JobMan, None, hkey)
-            log.info('Created mul2 job')            
+            self.vpsSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.vpsJobMan, None, hkey)
+            log.info('Created Vps job')            
         except Exception as e:
             log.exception(e)
         else:
-            if ((self.digimatSolver is not None) and (self.mul2Solver is not None)):
+            if ((self.digimatSolver is not None) and (self.vpsSolver is not None)):
                 digimatSolverSignature=self.digimatSolver.getApplicationSignature()
                 log.info("Working digimat solver on server " + digimatSolverSignature)
-                mul2SolverSignature=self.mul2Solver.getApplicationSignature()
-                log.info("Working mul2 solver on server " + mul2SolverSignature)
+                vpsSolverSignature=self.vpsSolver.getApplicationSignature()
+                log.info("Working vps solver on server " + vpsSolverSignature)
             else:
                 log.debug("Connection to server failed, exiting")
 
-        super(Airbus_Workflow_2, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
+        super(Airbus_Workflow_14, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
         log.info('Metadata were successfully validate')
 
         # To be sure update only required passed metadata in models
@@ -125,14 +129,12 @@ class Airbus_Workflow_2(Workflow.Workflow):
         }
 
         log.info('Setting Execution Metadata of Digimat')
-        log.info('Setting Execution Metadata of Mul2')
+        log.info('Setting Execution Metadata of Vps')
 
         
         self.digimatSolver.initialize(metaData=passingMD)
-        workDir = self.mul2Solver.getWorkDir() +'/'+self.mul2Solver.getJobID()
-        self.mul2Solver.initialize(metaData=passingMD, workdir = workDir)
-
-
+        # initialize vps solver
+        self.vpsSolver.initialize(metaData=passingMD)
 
                 
 
@@ -192,7 +194,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
 
 
         try:
-            # map properties from Digimat to properties of MUL2
+            # map properties from Digimat to properties of Vps
             # Young modulus
             compositeAxialYoung.propID = PropertyID.PID_YoungModulus1
             compositeInPlaneYoung1 = compositeInPlaneYoung
@@ -212,29 +214,29 @@ class Airbus_Workflow_2(Workflow.Workflow):
             compositeTransversePoisson2 =  compositeTransversePoisson
             compositeTransversePoisson2.propID = PropertyID.PID_PoissonRatio23
             
-            self.mul2Solver.setProperty(compositeAxialYoung)
-            self.mul2Solver.setProperty(compositeInPlaneYoung1)
-            self.mul2Solver.setProperty(compositeInPlaneYoung2)
+            self.vpsSolver.setProperty(compositeAxialYoung)
+            self.vpsSolver.setProperty(compositeInPlaneYoung1)
+            self.vpsSolver.setProperty(compositeInPlaneYoung2)
             
-            self.mul2Solver.setProperty(compositeInPlaneShear)          
-            self.mul2Solver.setProperty(compositeTransverseShear1)
-            self.mul2Solver.setProperty(compositeTransverseShear2)
+            self.vpsSolver.setProperty(compositeInPlaneShear)          
+            self.vpsSolver.setProperty(compositeTransverseShear1)
+            self.vpsSolver.setProperty(compositeTransverseShear2)
             
-            self.mul2Solver.setProperty(compositeInPlanePoisson)          
-            self.mul2Solver.setProperty(compositeTransversePoisson1)
-            self.mul2Solver.setProperty(compositeTransversePoisson2)
+            self.vpsSolver.setProperty(compositeInPlanePoisson)          
+            self.vpsSolver.setProperty(compositeTransversePoisson1)
+            self.vpsSolver.setProperty(compositeTransversePoisson2)
             
             
         except Exception as err:
-            print ("Setting MUL2 params failed: " + repr(err));
+            print ("Setting Vps params failed: " + repr(err));
             self.terminate()
             
         try:
             # solve digimat part
-            log.info("Running Mul2")
-            self.mul2Solver.solveStep(None)
+            log.info("Running Vps")
+            self.vpsSolver.solveStep(None)
             ## get the desired properties
-            self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.mul2Solver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.vpsSolver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -248,8 +250,8 @@ class Airbus_Workflow_2(Workflow.Workflow):
     def terminate(self):
         #self.thermalAppRec.terminateAll()
         self.digimatSolver.terminate()
-        self.mul2Solver.terminate()
-        super(Airbus_Workflow_2, self).terminate()
+        self.vpsSolver.terminate()
+        super(Airbus_Workflow_14, self).terminate()
 
     def getApplicationSignature(self):
         return "Composelector workflow 1.0"
@@ -294,7 +296,7 @@ def workflow(inputGUID, execGUID):
         inclusionAspectRatio = 1
         
         try:
-            workflow = Airbus_Workflow_2()
+            workflow = Airbus_Workflow_14()
             workflowMD = {
                 'Execution': {
                     'ID': '1',
@@ -310,7 +312,8 @@ def workflow(inputGUID, execGUID):
             workflow.setProperty(Property.ConstantProperty(inclusionPoisson, PropertyID.PID_InclusionPoisson,          ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionVolumeFraction, PropertyID.PID_InclusionVolumeFraction,   ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionAspectRatio, PropertyID.PID_InclusionAspectRatio,      ValueType.Scalar, "none"))
-            
+
+                      
             # solve workflow
             workflow.solve()
             
@@ -325,7 +328,7 @@ def workflow(inputGUID, execGUID):
             compositeInPlanePoisson = workflow.getProperty(PropertyID.PID_CompositeInPlanePoisson,time).getValue()
             compositeTransversePoisson = workflow.getProperty(PropertyID.PID_CompositeTransversePoisson,time).getValue()
             
-            # collect MUL2 outputs
+            # collect Vps outputs
             #KPI 1-1 weight
             #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
             #log.info("Requested KPI : Weight: " + str(weight) + ' kg')

@@ -1,0 +1,12 @@
+2019-12-15 00:13:55 INFO:A_4.py:38 Setting Workflow basic metadata 
+
+2019-12-15 00:13:55 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2019-12-15 00:13:55 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.54 
+
+2019-12-15 00:13:55 INFO:PyroUtil.py:556 Located Job Manager Abaqus@Mupif.LIST at: 172.30.0.163 44385 None None 
+
+2019-12-15 00:13:55 DEBUG:PyroUtil.py:252 Application Abaqus@Mupif.LIST, found URI PYRO:obj_4e576cc410bc44ecb934acb54e944692@172.30.0.163:44385 on ('172.30.0.163', 44385, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f97971b8d68; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2019-12-15 00:13:55 INFO:PyroUtil.py:260 Connecting to application Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7f97971b8e48; not connected; for PYRO:obj_4e576cc410bc44ecb934acb54e944692@172.30.0.163:44385> 
+

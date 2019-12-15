@@ -15,11 +15,11 @@ if not debug:
 nshost = '172.30.0.1'
 nsport = 9090
 hkey = 'mupif-secret-key'
-digimatJobManName='eX_DigimatMF_JobManager'
-abaqusJobManName='Abaqus@Mupif.LIST'
+digimatJobManName = 'eX_DigimatMF_JobManager'
+abaqusJobManName = 'Abaqus@Mupif.LIST'
 
-class Airbus_Workflow_2(Workflow.Workflow):
-   
+class Airbus_Workflow_5(Workflow.Workflow):
+
     def __init__(self, metaData={}):
         """
         Initializes the workflow. As the workflow is non-stationary, we allocate individual 
@@ -28,7 +28,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
         log.info('Setting Workflow basic metadata')
         MD = {
             'Name': 'Airbus Case',
-            'ID': '1_2_2',
+            'ID': 'A_5',
             'Description': 'Simulation of ',
             'Model_refs_ID': ['xy', 'xy'],
             'Inputs': [
@@ -63,7 +63,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
             ]
         }
 
-        super(Airbus_Workflow_2, self).__init__(metaData=MD)
+        super(Airbus_Workflow_5, self).__init__(metaData=MD)
         self.updateMetadata(metaData)        
 
         #list of recognized input porperty IDs
@@ -81,7 +81,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
 
         # solvers
         self.digimatSolver = None
-        self.mul2Solver = None
+        self.abaqusSolver = None
         
 
 
@@ -91,28 +91,28 @@ class Airbus_Workflow_2(Workflow.Workflow):
         ns = PyroUtil.connectNameServer(nshost, nsport, hkey)
         #connect to digimat JobManager running on (remote) server
         self.digimatJobMan = PyroUtil.connectJobManager(ns, digimatJobManName,hkey)
-        #connect to mult2 JobManager running on (remote) server
-        self.mul2JobMan = PyroUtil.connectJobManager(ns, mul2JobManName,hkey)
+        #connect to abaqus JobManager running on (remote) server
+        self.abaqusJobMan = PyroUtil.connectJobManager(ns, abaqusJobManName,hkey)
         
 
         #allocate the Digimat remote instance
         try:
             self.digimatSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.digimatJobMan, None, hkey)
             log.info('Created digimat job')
-            self.mul2Solver = PyroUtil.allocateApplicationWithJobManager( ns, self.mul2JobMan, None, hkey)
-            log.info('Created mul2 job')            
+            self.abaqusSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.abaqusJobMan, None, hkey)
+            log.info('Created Abaqus job')            
         except Exception as e:
             log.exception(e)
         else:
-            if ((self.digimatSolver is not None) and (self.mul2Solver is not None)):
+            if ((self.digimatSolver is not None) and (self.abaqusSolver is not None)):
                 digimatSolverSignature=self.digimatSolver.getApplicationSignature()
                 log.info("Working digimat solver on server " + digimatSolverSignature)
-                mul2SolverSignature=self.mul2Solver.getApplicationSignature()
-                log.info("Working mul2 solver on server " + mul2SolverSignature)
+                abaqusSolverSignature=self.abaqusSolver.getApplicationSignature()
+                log.info("Working abaqus solver on server " + abaqusSolverSignature)
             else:
                 log.debug("Connection to server failed, exiting")
 
-        super(Airbus_Workflow_2, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
+        super(Airbus_Workflow_5, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
         log.info('Metadata were successfully validate')
 
         # To be sure update only required passed metadata in models
@@ -125,12 +125,68 @@ class Airbus_Workflow_2(Workflow.Workflow):
         }
 
         log.info('Setting Execution Metadata of Digimat')
-        log.info('Setting Execution Metadata of Mul2')
+        log.info('Setting Execution Metadata of Abaqus')
 
         
         self.digimatSolver.initialize(metaData=passingMD)
-        workDir = self.mul2Solver.getWorkDir() +'/'+self.mul2Solver.getJobID()
-        self.mul2Solver.initialize(metaData=passingMD, workdir = workDir)
+
+
+        ###########################################################################################
+        ### START ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
+        # select input file location: True = application server, False: control script computer
+        filesend = False
+        
+        # Define server path of input files
+        print('**** copy files to working directories')
+        if filesend:
+            basepath=os.path.abspath('..')
+            inpDir2 = os.path.join(basepath,'abaqusserver','inputFiles')
+        else:
+            inpDir2 = os.path.abspath('./inputFiles')
+            
+            # identify input files
+            print("Identifying input files.")
+            workflow.file2 = glob.glob(os.path.join(inpDir2, cfile2))[0]
+            workflow.file2 = os.path.basename(workflow.file2)
+            
+            try:
+                inpFiles2 = []
+                if filesend:
+                    inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile1)))
+                    inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile2)))
+                else:
+                    inpFiles2.append(cfile1)
+                    inpFiles2.append(cfile2)
+            except Exception as err:
+                print("Error:" + repr(err))
+                
+            # copy Abaqus input files to server work directories
+            print("Transferring input files to the work directory.")
+            if filesend:
+                print("$$$ Uploading input files from application server to workdir")
+            try:
+                for inpFile in inpFiles2:
+                    shutil.copy(inpFile, workflow.abaqusJobMan.getJobWorkDir(workflow.abaqusSolver.getJobID()))
+            except Exception as err:
+                print("Error:" + repr(err))
+            else:
+                print("$$$ Uploading input files from control computer to workdir")
+                log.info("Uploading input files to server")
+                try:
+                    for inpFile in inpFiles2:
+                        pf = workflow.abaqusJobMan.getPyroFile(workflow.solver2.getJobID(), inpFile, 'wb')
+                        PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, hkey)
+                except Exception as err:
+                    print("Error:" + repr(err))
+                    
+                ### END ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
+                #########################################################################################
+            print('FILES COPIED')
+
+            # initialize abaqus solver
+            self.abaqusSolver.initialize(metaData=passingMD, file = workflow.file2, workdir = self.abaqusJobMan.getJobWorkDir(workflow.abaqusSolver.getJobID()))
+            print('SOLVER INITIALIZED')
+############################
 
 
 
@@ -192,7 +248,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
 
 
         try:
-            # map properties from Digimat to properties of MUL2
+            # map properties from Digimat to properties of Abaqus
             # Young modulus
             compositeAxialYoung.propID = PropertyID.PID_YoungModulus1
             compositeInPlaneYoung1 = compositeInPlaneYoung
@@ -212,29 +268,29 @@ class Airbus_Workflow_2(Workflow.Workflow):
             compositeTransversePoisson2 =  compositeTransversePoisson
             compositeTransversePoisson2.propID = PropertyID.PID_PoissonRatio23
             
-            self.mul2Solver.setProperty(compositeAxialYoung)
-            self.mul2Solver.setProperty(compositeInPlaneYoung1)
-            self.mul2Solver.setProperty(compositeInPlaneYoung2)
+            self.abaqusSolver.setProperty(compositeAxialYoung)
+            self.abaqusSolver.setProperty(compositeInPlaneYoung1)
+            self.abaqusSolver.setProperty(compositeInPlaneYoung2)
             
-            self.mul2Solver.setProperty(compositeInPlaneShear)          
-            self.mul2Solver.setProperty(compositeTransverseShear1)
-            self.mul2Solver.setProperty(compositeTransverseShear2)
+            self.abaqusSolver.setProperty(compositeInPlaneShear)          
+            self.abaqusSolver.setProperty(compositeTransverseShear1)
+            self.abaqusSolver.setProperty(compositeTransverseShear2)
             
-            self.mul2Solver.setProperty(compositeInPlanePoisson)          
-            self.mul2Solver.setProperty(compositeTransversePoisson1)
-            self.mul2Solver.setProperty(compositeTransversePoisson2)
+            self.abaqusSolver.setProperty(compositeInPlanePoisson)          
+            self.abaqusSolver.setProperty(compositeTransversePoisson1)
+            self.abaqusSolver.setProperty(compositeTransversePoisson2)
             
             
         except Exception as err:
-            print ("Setting MUL2 params failed: " + repr(err));
+            print ("Setting Abaqus params failed: " + repr(err));
             self.terminate()
             
         try:
             # solve digimat part
-            log.info("Running Mul2")
-            self.mul2Solver.solveStep(None)
+            log.info("Running Abaqus")
+            self.abaqusSolver.solveStep(None)
             ## get the desired properties
-            self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.mul2Solver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.abaqusSolver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -248,8 +304,8 @@ class Airbus_Workflow_2(Workflow.Workflow):
     def terminate(self):
         #self.thermalAppRec.terminateAll()
         self.digimatSolver.terminate()
-        self.mul2Solver.terminate()
-        super(Airbus_Workflow_2, self).terminate()
+        self.abaqusSolver.terminate()
+        super(Airbus_Workflow_5, self).terminate()
 
     def getApplicationSignature(self):
         return "Composelector workflow 1.0"
@@ -294,7 +350,7 @@ def workflow(inputGUID, execGUID):
         inclusionAspectRatio = 1
         
         try:
-            workflow = Airbus_Workflow_2()
+            workflow = Airbus_Workflow_5()
             workflowMD = {
                 'Execution': {
                     'ID': '1',
@@ -310,7 +366,8 @@ def workflow(inputGUID, execGUID):
             workflow.setProperty(Property.ConstantProperty(inclusionPoisson, PropertyID.PID_InclusionPoisson,          ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionVolumeFraction, PropertyID.PID_InclusionVolumeFraction,   ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionAspectRatio, PropertyID.PID_InclusionAspectRatio,      ValueType.Scalar, "none"))
-            
+
+                      
             # solve workflow
             workflow.solve()
             
@@ -325,7 +382,7 @@ def workflow(inputGUID, execGUID):
             compositeInPlanePoisson = workflow.getProperty(PropertyID.PID_CompositeInPlanePoisson,time).getValue()
             compositeTransversePoisson = workflow.getProperty(PropertyID.PID_CompositeTransversePoisson,time).getValue()
             
-            # collect MUL2 outputs
+            # collect Abaqus outputs
             #KPI 1-1 weight
             #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
             #log.info("Requested KPI : Weight: " + str(weight) + ' kg')
