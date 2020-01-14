@@ -1,42 +1,90 @@
-2019-12-14 23:47:52 INFO:A_5.py:28 Setting Workflow basic metadata 
+2020-01-14 10:32:45 INFO:A_5.py:34 Setting Workflow basic metadata 
 
-2019-12-14 23:47:52 INFO:A_5.py:89 Workflow initialization 
+2020-01-14 10:32:45 INFO:A_5.py:127 Workflow initialization 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+2020-01-14 10:32:45 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.54 
+2020-01-14 10:32:46 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
 
-2019-12-14 23:47:53 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+2020-01-14 10:32:46 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_ff9affc2f105410d9c0981f768bc9b4c@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f61a057a2b0; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+2020-01-14 10:32:46 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fb8a8fc7b38; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
 
-2019-12-14 23:47:53 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f61a057a630; not connected; for PYRO:obj_ff9affc2f105410d9c0981f768bc9b4c@172.30.0.112:44382> 
+2020-01-14 10:32:46 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fb8a8fc7fd0; not connected; for PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382> 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+2020-01-14 10:32:46 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
 
-2019-12-14 23:47:53 INFO:PyroUtil.py:556 Located Job Manager Abaqus@Mupif.LIST at: 172.30.0.163 44385 None None 
+2020-01-14 10:32:46 INFO:PyroUtil.py:556 Located Job Manager Abaqus@Mupif.LIST at: 172.30.0.163 44385 None None 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:252 Application Abaqus@Mupif.LIST, found URI PYRO:obj_4e576cc410bc44ecb934acb54e944692@172.30.0.163:44385 on ('172.30.0.163', 44385, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f61a057a2b0; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+2020-01-14 10:32:46 DEBUG:PyroUtil.py:252 Application Abaqus@Mupif.LIST, found URI PYRO:obj_4766d4ed19d847299a107435dd297b0b@172.30.0.163:44385 on ('172.30.0.163', 44385, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fb8a8fc7b38; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
 
-2019-12-14 23:47:53 INFO:PyroUtil.py:260 Connecting to application Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7f61a057a4a8; not connected; for PYRO:obj_4e576cc410bc44ecb934acb54e944692@172.30.0.163:44385> 
+2020-01-14 10:32:46 INFO:PyroUtil.py:260 Connecting to application Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7fb8a8fdfef0; not connected; for PYRO:obj_4766d4ed19d847299a107435dd297b0b@172.30.0.163:44385> 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application Abaqus@Mupif.LIST 
+2020-01-14 10:32:46 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application Abaqus@Mupif.LIST 
 
-2019-12-14 23:47:53 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+2020-01-14 10:32:46 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
 
-2019-12-14 23:47:54 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '1@eX_DigimatMF_JobManager', 9000) 
+2020-01-14 10:32:47 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '6@eX_DigimatMF_JobManager', 9005) 
 
-2019-12-14 23:47:54 INFO:PyroUtil.py:638 Scenario: Connecting to 1@eX_DigimatMF_JobManager 9000 
+2020-01-14 10:32:47 INFO:PyroUtil.py:638 Scenario: Connecting to 6@eX_DigimatMF_JobManager 9005 
 
-2019-12-14 23:47:54 DEBUG:PyroUtil.py:252 Application 1@eX_DigimatMF_JobManager, found URI PYRO:obj_163ec19bf70746f6adf0162b9563ffa5@172.30.0.112:9000 on ('172.30.0.112', 9000, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f61a057a2b0; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+2020-01-14 10:32:47 DEBUG:PyroUtil.py:252 Application 6@eX_DigimatMF_JobManager, found URI PYRO:obj_27bcc1a10b8d4fcdb8c72c1a91e56d76@172.30.0.112:9005 on ('172.30.0.112', 9005, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fb8a8fc7b38; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
 
-2019-12-14 23:47:54 INFO:PyroUtil.py:260 Connecting to application 1@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f61a056b5c0; not connected; for PYRO:obj_163ec19bf70746f6adf0162b9563ffa5@172.30.0.112:9000> 
+2020-01-14 10:32:47 INFO:PyroUtil.py:260 Connecting to application 6@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fb8a8fdffd0; not connected; for PYRO:obj_27bcc1a10b8d4fcdb8c72c1a91e56d76@172.30.0.112:9005> 
 
-2019-12-14 23:47:55 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 1@eX_DigimatMF_JobManager 
+2020-01-14 10:32:47 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 6@eX_DigimatMF_JobManager 
 
-2019-12-14 23:47:55 INFO:A_5.py:101 Created digimat job 
+2020-01-14 10:32:47 INFO:A_5.py:139 Created digimat job 
 
-2019-12-14 23:47:55 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+2020-01-14 10:32:47 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
 
-2019-12-14 23:56:44 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 1@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+2020-01-14 10:32:49 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '22@Abaqus@Mupif.LIST', 9271) 
+
+2020-01-14 10:32:49 INFO:PyroUtil.py:638 Scenario: Connecting to 22@Abaqus@Mupif.LIST 9271 
+
+2020-01-14 10:32:49 DEBUG:PyroUtil.py:252 Application 22@Abaqus@Mupif.LIST, found URI PYRO:obj_15cb8b4babe14cfa81e88a0bfd4c4c01@172.30.0.163:9271 on ('172.30.0.163', 9271, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fb8a8fc7b38; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:32:49 INFO:PyroUtil.py:260 Connecting to application 22@Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7fb8a8ff1400; not connected; for PYRO:obj_15cb8b4babe14cfa81e88a0bfd4c4c01@172.30.0.163:9271> 
+
+2020-01-14 10:32:49 DEBUG:PyroUtil.py:262 Connected to LIST_Abaqus_API with the application 22@Abaqus@Mupif.LIST 
+
+2020-01-14 10:32:49 INFO:A_5.py:141 Created Abaqus job 
+
+2020-01-14 10:32:49 INFO:A_5.py:147 Working digimat solver on server DigimatApplication 
+
+2020-01-14 10:32:49 INFO:A_5.py:149 Working abaqus solver on server LIST_Abaqus_API 
+
+2020-01-14 10:32:49 INFO:A_5.py:154 Metadata were successfully validate 
+
+2020-01-14 10:32:49 INFO:A_5.py:165 Setting Execution Metadata of Digimat 
+
+2020-01-14 10:32:49 INFO:A_5.py:166 Setting Execution Metadata of Abaqus 
+
+2020-01-14 10:32:49 INFO:A_5.py:180 **** copy files to working directories 
+
+2020-01-14 10:32:49 INFO:A_5.py:188 Identifying input files. 
+
+2020-01-14 10:32:49 INFO:A_5.py:206 Transferring input files to the work directory. 
+
+2020-01-14 10:32:49 INFO:A_5.py:215 $$$ Uploading input files from control computer to workdir 
+
+2020-01-14 10:32:49 INFO:A_5.py:216 Uploading input files to server 
+
+2020-01-14 10:34:03 INFO:A_5.py:226 FILES COPIED 
+
+2020-01-14 10:34:03 INFO:A_5.py:240 SOLVER INITIALIZED 
+
+2020-01-14 10:34:03 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:34:04 INFO:A_5.py:284 Running Digimat 
+
+2020-01-14 10:34:06 INFO:A_5.py:341 Running Abaqus 
+
+2020-01-14 10:51:10 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 6@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+
+2020-01-14 10:51:11 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 22@Abaqus@Mupif.LIST on Abaqus@Mupif.LIST 
+
+2020-01-14 10:51:11 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:51:11 INFO:A_5.py:451 WORKFLOW SOLVED 
 

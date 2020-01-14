@@ -1,0 +1,50 @@
+2020-01-14 11:09:02 INFO:A_9p.py:33 Setting Workflow basic metadata 
+
+2020-01-14 11:09:02 INFO:A_9p.py:95 Workflow initialization 
+
+2020-01-14 11:09:02 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 11:09:02 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 11:09:02 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2020-01-14 11:09:02 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fd6e3e73b70; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 11:09:02 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fd6e3e73fd0; not connected; for PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382> 
+
+2020-01-14 11:09:02 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+
+2020-01-14 11:09:02 INFO:PyroUtil.py:556 Located Job Manager ESI_VPS_Jobmanager_MUPIF_v2.2 at: 172.30.0.91 44383 None None 
+
+2020-01-14 11:09:02 DEBUG:PyroUtil.py:252 Application ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383 on ('172.30.0.91', 44383, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fd6e3e73b70; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 11:09:02 INFO:PyroUtil.py:260 Connecting to application ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7fd6e3e8bfd0; not connected; for PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383> 
+
+2020-01-14 11:09:03 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 11:09:03 INFO:PyroUtil.py:556 Located Job Manager Mupif.JobManager@INSA at: 172.30.0.151 44382 None None 
+
+2020-01-14 11:09:03 DEBUG:PyroUtil.py:252 Application Mupif.JobManager@INSA, found URI PYRO:obj_8bbf9b7857cc4da491b0eb4d0f7d3fde@172.30.0.151:44382 on ('172.30.0.151', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fd6e3e73b70; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 11:09:03 INFO:PyroUtil.py:260 Connecting to application Mupif.JobManager@INSA with <Pyro4.core.Proxy at 0x7fd6e3e8be80; not connected; for PYRO:obj_8bbf9b7857cc4da491b0eb4d0f7d3fde@172.30.0.151:44382> 
+
+2020-01-14 11:09:03 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application Mupif.JobManager@INSA 
+
+2020-01-14 11:09:03 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 11:09:04 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '11@eX_DigimatMF_JobManager', 9010) 
+
+2020-01-14 11:09:04 INFO:PyroUtil.py:638 Scenario: Connecting to 11@eX_DigimatMF_JobManager 9010 
+
+2020-01-14 11:09:04 DEBUG:PyroUtil.py:252 Application 11@eX_DigimatMF_JobManager, found URI PYRO:obj_715e2cca42af40ebbae9305dfe58253c@172.30.0.112:9010 on ('172.30.0.112', 9010, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fd6e3e73b70; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 11:09:04 INFO:PyroUtil.py:260 Connecting to application 11@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7fd6e3e9f390; not connected; for PYRO:obj_715e2cca42af40ebbae9305dfe58253c@172.30.0.112:9010> 
+
+2020-01-14 11:09:04 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 11@eX_DigimatMF_JobManager 
+
+2020-01-14 11:09:04 INFO:A_9p.py:110 Created digimat job 
+
+2020-01-14 11:09:04 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 11:11:45 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 11@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+

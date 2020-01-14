@@ -1,0 +1,112 @@
+2020-01-08 16:22:32 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-08 16:22:32 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-08 16:22:32 INFO:PyroUtil.py:338 Pyro4 daemon runs on 172.30.0.73:44530 using nathost None:None 
+
+2020-01-08 16:22:32 DEBUG:SimpleJobManager.py:196 SimpleJobManager2: initialization done for application name Mupif.Abaqus@Demo 
+
+2020-01-08 16:22:32 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-08 16:22:32 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-08 16:22:32 WARNING:PyroUtil.py:389 Application name 'Mupif.Abaqus@Demo' is already registered on name server, overwriting. 
+
+2020-01-08 16:22:32 DEBUG:PyroUtil.py:409 NameServer Mupif.Abaqus@Demo has registered uri PYRO:obj_6fe02a235b754bc7a2488451f3bd52ef@172.30.0.73:44530 
+
+2020-01-08 16:22:32 DEBUG:PyroUtil.py:412 Running runAppServer: server:172.30.0.73, port:44530, nathost:None, natport:None, nameServer:172.30.0.1, nameServerPort:9090, applicationName:Mupif.Abaqus@Demo, daemon URI PYRO:obj_6fe02a235b754bc7a2488451f3bd52ef@172.30.0.73:44530 
+
+2020-01-08 16:22:48 INFO:SimpleJobManager.py:206 SimpleJobManager2: allocateJob... 
+
+2020-01-08 16:22:48 DEBUG:SimpleJobManager.py:217 SimpleJobManager2: trying to allocate 1@Mupif.Abaqus@Demo 
+
+2020-01-08 16:22:48 INFO:SimpleJobManager.py:220 SimpleJobManager2: port to be assigned 9550 
+
+2020-01-08 16:22:48 INFO:SimpleJobManager.py:224 SimpleJobManager2: Checking target workdir /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/1@Mupif.Abaqus@Demo 
+
+2020-01-08 16:22:48 INFO:SimpleJobManager.py:240 Using python interpreter /usr/bin/python3 
+
+2020-01-08 16:22:48 DEBUG:SimpleJobManager.py:244 SimpleJobManager2: new subprocess has been started: /usr/bin/python3 /home/nitram/Documents/work/MUPIF/mupif/mupif/tools/JobMan2cmd.py -p 9550 -j 1@Mupif.Abaqus@Demo -n None -d /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/1@Mupif.Abaqus@Demo -s 10001 -i /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus -c mechanicalServerConfig -m 2 
+
+2020-01-08 16:22:48 DEBUG:SimpleJobManager.py:254 Connected by ('127.0.0.1', 46520) 
+
+2020-01-08 16:22:48 INFO:SimpleJobManager.py:260 Received uri: b'PYRO:obj_3153e6764558489ea2aeca813667a19b@172.30.0.73:9550 
+
+2020-01-08 16:22:48 DEBUG:SimpleJobManager.py:269 SimpleJobManager2: new process  
+
+2020-01-08 16:22:48 DEBUG:SimpleJobManager.py:270 (<subprocess.Popen object at 0x7f002ae8b780>, 1578496968.3506708, 'nitram@JvN', "b'PYRO:obj_3153e6764558489ea2aeca813667a19b@172.30.0.73:9550", 9550) 
+
+2020-01-08 16:22:48 INFO:SimpleJobManager.py:278 SimpleJobManager2:allocateJob: allocated 1@Mupif.Abaqus@Demo 
+
+2020-01-08 16:22:48 DEBUG:SimpleJobManager.py:299 SimpleJobManager2:terminateJob: job 1@Mupif.Abaqus@Demo terminated, freeing port 9550 
+
+2020-01-08 16:26:41 INFO:SimpleJobManager.py:206 SimpleJobManager2: allocateJob... 
+
+2020-01-08 16:26:41 DEBUG:SimpleJobManager.py:217 SimpleJobManager2: trying to allocate 2@Mupif.Abaqus@Demo 
+
+2020-01-08 16:26:41 INFO:SimpleJobManager.py:220 SimpleJobManager2: port to be assigned 9551 
+
+2020-01-08 16:26:41 INFO:SimpleJobManager.py:224 SimpleJobManager2: Checking target workdir /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/2@Mupif.Abaqus@Demo 
+
+2020-01-08 16:26:41 INFO:SimpleJobManager.py:240 Using python interpreter /usr/bin/python3 
+
+2020-01-08 16:26:41 DEBUG:SimpleJobManager.py:244 SimpleJobManager2: new subprocess has been started: /usr/bin/python3 /home/nitram/Documents/work/MUPIF/mupif/mupif/tools/JobMan2cmd.py -p 9551 -j 2@Mupif.Abaqus@Demo -n None -d /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/2@Mupif.Abaqus@Demo -s 10001 -i /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus -c mechanicalServerConfig -m 2 
+
+2020-01-08 16:26:41 DEBUG:SimpleJobManager.py:254 Connected by ('127.0.0.1', 46588) 
+
+2020-01-08 16:26:41 INFO:SimpleJobManager.py:260 Received uri: b'PYRO:obj_8b359cd2faa24f2ebd782bc7e567a525@172.30.0.73:9551 
+
+2020-01-08 16:26:41 DEBUG:SimpleJobManager.py:269 SimpleJobManager2: new process  
+
+2020-01-08 16:26:41 DEBUG:SimpleJobManager.py:270 (<subprocess.Popen object at 0x7f002ae8b908>, 1578497201.632209, 'nitram@JvN', "b'PYRO:obj_8b359cd2faa24f2ebd782bc7e567a525@172.30.0.73:9551", 9551) 
+
+2020-01-08 16:26:41 INFO:SimpleJobManager.py:278 SimpleJobManager2:allocateJob: allocated 2@Mupif.Abaqus@Demo 
+
+2020-01-08 16:26:41 DEBUG:SimpleJobManager.py:299 SimpleJobManager2:terminateJob: job 2@Mupif.Abaqus@Demo terminated, freeing port 9551 
+
+2020-01-08 16:28:27 INFO:SimpleJobManager.py:206 SimpleJobManager2: allocateJob... 
+
+2020-01-08 16:28:27 DEBUG:SimpleJobManager.py:217 SimpleJobManager2: trying to allocate 3@Mupif.Abaqus@Demo 
+
+2020-01-08 16:28:27 INFO:SimpleJobManager.py:220 SimpleJobManager2: port to be assigned 9552 
+
+2020-01-08 16:28:27 INFO:SimpleJobManager.py:224 SimpleJobManager2: Checking target workdir /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/3@Mupif.Abaqus@Demo 
+
+2020-01-08 16:28:27 INFO:SimpleJobManager.py:240 Using python interpreter /usr/bin/python3 
+
+2020-01-08 16:28:27 DEBUG:SimpleJobManager.py:244 SimpleJobManager2: new subprocess has been started: /usr/bin/python3 /home/nitram/Documents/work/MUPIF/mupif/mupif/tools/JobMan2cmd.py -p 9552 -j 3@Mupif.Abaqus@Demo -n None -d /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/3@Mupif.Abaqus@Demo -s 10001 -i /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus -c mechanicalServerConfig -m 2 
+
+2020-01-08 16:28:27 DEBUG:SimpleJobManager.py:254 Connected by ('127.0.0.1', 46640) 
+
+2020-01-08 16:28:27 INFO:SimpleJobManager.py:260 Received uri: b'PYRO:obj_45dafb6034554b73a9a34545ac421d93@172.30.0.73:9552 
+
+2020-01-08 16:28:27 DEBUG:SimpleJobManager.py:269 SimpleJobManager2: new process  
+
+2020-01-08 16:28:27 DEBUG:SimpleJobManager.py:270 (<subprocess.Popen object at 0x7f002ae8ba20>, 1578497307.4783833, 'nitram@JvN', "b'PYRO:obj_45dafb6034554b73a9a34545ac421d93@172.30.0.73:9552", 9552) 
+
+2020-01-08 16:28:27 INFO:SimpleJobManager.py:278 SimpleJobManager2:allocateJob: allocated 3@Mupif.Abaqus@Demo 
+
+2020-01-08 16:30:21 INFO:SimpleJobManager.py:206 SimpleJobManager2: allocateJob... 
+
+2020-01-08 16:30:21 DEBUG:SimpleJobManager.py:217 SimpleJobManager2: trying to allocate 4@Mupif.Abaqus@Demo 
+
+2020-01-08 16:30:21 INFO:SimpleJobManager.py:220 SimpleJobManager2: port to be assigned 9553 
+
+2020-01-08 16:30:21 INFO:SimpleJobManager.py:224 SimpleJobManager2: Checking target workdir /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/4@Mupif.Abaqus@Demo 
+
+2020-01-08 16:30:21 INFO:SimpleJobManager.py:240 Using python interpreter /usr/bin/python3 
+
+2020-01-08 16:30:21 DEBUG:SimpleJobManager.py:244 SimpleJobManager2: new subprocess has been started: /usr/bin/python3 /home/nitram/Documents/work/MUPIF/mupif/mupif/tools/JobMan2cmd.py -p 9553 -j 4@Mupif.Abaqus@Demo -n None -d /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/4@Mupif.Abaqus@Demo -s 10001 -i /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus -c mechanicalServerConfig -m 2 
+
+2020-01-08 16:30:22 DEBUG:SimpleJobManager.py:254 Connected by ('127.0.0.1', 46686) 
+
+2020-01-08 16:30:22 INFO:SimpleJobManager.py:260 Received uri: b'PYRO:obj_815c8007f06c476fa887248511c3f15d@172.30.0.73:9553 
+
+2020-01-08 16:30:22 DEBUG:SimpleJobManager.py:269 SimpleJobManager2: new process  
+
+2020-01-08 16:30:22 DEBUG:SimpleJobManager.py:270 (<subprocess.Popen object at 0x7f002ae8bb00>, 1578497422.3967373, 'nitram@JvN', "b'PYRO:obj_815c8007f06c476fa887248511c3f15d@172.30.0.73:9553", 9553) 
+
+2020-01-08 16:30:22 INFO:SimpleJobManager.py:278 SimpleJobManager2:allocateJob: allocated 4@Mupif.Abaqus@Demo 
+
+2020-01-08 16:30:22 DEBUG:SimpleJobManager.py:299 SimpleJobManager2:terminateJob: job 4@Mupif.Abaqus@Demo terminated, freeing port 9553 
+

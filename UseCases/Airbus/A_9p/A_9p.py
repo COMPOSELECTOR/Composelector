@@ -9,16 +9,21 @@ import mupif.Physics.PhysicalQuantities as PQ
 
 debug = True
 
+
 if not debug:
     import ComposelectorSimulationTools.MIUtilities as miu
+    import ApplicationsConfigs.LAMMPS_v3 as lammps
+else:
+    import LAMMPS_v4 as lammps
 
 nshost = '172.30.0.1'
 nsport = 9090
 hkey = 'mupif-secret-key'
 digimatJobManName = 'eX_DigimatMF_JobManager'
-vpsJobManName='ESI_VPS_Jobmanager'
+comsolJobManName = 'Mupif.JobManager@INSA'
+vpsJobManName= 'ESI_VPS_Jobmanager_MUPIF_v2.2'
 
-class Airbus_Workflow_14(Workflow.Workflow):
+class Airbus_Workflow_9p(Workflow.Workflow):
 
     def __init__(self, metaData={}):
         """
@@ -63,7 +68,7 @@ class Airbus_Workflow_14(Workflow.Workflow):
             ]
         }
 
-        super(Airbus_Workflow_14, self).__init__(metaData=MD)
+        super(Airbus_Workflow_9p, self).__init__(metaData=MD)
         self.updateMetadata(metaData)        
 
         #list of recognized input porperty IDs
@@ -81,6 +86,7 @@ class Airbus_Workflow_14(Workflow.Workflow):
 
         # solvers
         self.digimatSolver = None
+        self.comsolSolver = None
         self.vpsSolver = None
         
 
@@ -93,18 +99,25 @@ class Airbus_Workflow_14(Workflow.Workflow):
         self.digimatJobMan = PyroUtil.connectJobManager(ns, digimatJobManName,hkey)
         #connect to vps JobManager running on (remote) server
         self.vpsJobMan = PyroUtil.connectJobManager(ns, vpsJobManName,hkey)
-        
+        #connect to comsol JobManager running on (remote) server
+        self.comsolJobMan = PyroUtil.connectJobManager(ns, comsolJobManName,hkey)
 
+
+        
         #allocate the Digimat remote instance
         try:
             self.digimatSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.digimatJobMan, None, hkey)
             log.info('Created digimat job')
+            self.comsolSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.comsolJobMan, None, hkey)
+            log.info('Created comsol job')
             self.vpsSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.vpsJobMan, None, hkey)
             log.info('Created Vps job')            
         except Exception as e:
             log.exception(e)
         else:
-            if ((self.digimatSolver is not None) and (self.vpsSolver is not None)):
+            if ((self.comsolSolver is not None) and (self.digimatSolver is not None) and (self.vpsSolver is not None)):
+                comsolSolverSignature=self.comsolSolver.getApplicationSignature()
+                log.info("Working comsol solver on server " + comsolSolverSignature)
                 digimatSolverSignature=self.digimatSolver.getApplicationSignature()
                 log.info("Working digimat solver on server " + digimatSolverSignature)
                 vpsSolverSignature=self.vpsSolver.getApplicationSignature()
@@ -112,7 +125,7 @@ class Airbus_Workflow_14(Workflow.Workflow):
             else:
                 log.debug("Connection to server failed, exiting")
 
-        super(Airbus_Workflow_14, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
+        super(Airbus_Workflow_9p, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
         log.info('Metadata were successfully validate')
 
         # To be sure update only required passed metadata in models
@@ -127,8 +140,10 @@ class Airbus_Workflow_14(Workflow.Workflow):
         log.info('Setting Execution Metadata of Digimat')
         log.info('Setting Execution Metadata of Vps')
 
-        
+        # initialize digimat solver        
         self.digimatSolver.initialize(metaData=passingMD)
+        # initialize comsol solver        
+        self.comsolSolver.initialize(metaData=passingMD)
         # initialize vps solver
         self.vpsSolver.initialize(metaData=passingMD)
 
@@ -190,6 +205,24 @@ class Airbus_Workflow_14(Workflow.Workflow):
 
 
         try:
+            # solve comsol part
+            log.info("Running comsol")
+            self.comsolSolver.solveStep(None)
+            ## get the desired properties
+            # get domain number to filter tooling
+            self.domainNumber = self.comsolSolver.getField(FieldID.FID_DomainNumber,0,0)
+            ## get fibre orientation for four different layers, already on filtered domain (no toling)
+            self.fibreOrientation0 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1), self.domainNumber, 1.0)
+            self.fibreOrientation90 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,2), self.domainNumber, 1.0)
+            self.fibreOrientation45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,3), self.domainNumber, 1.0)
+            self.fibreOrientation_45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,4), self.domainNumber, 1.0)
+        except Exception as err:
+            print ("Error:" + repr(err))
+            self.terminate()    
+
+            
+
+        try:
             # map properties from Digimat to properties of Vps
             # Young modulus
             compositeAxialYoung.propID = PropertyID.PID_YoungModulus1
@@ -222,6 +255,13 @@ class Airbus_Workflow_14(Workflow.Workflow):
             self.vpsSolver.setProperty(compositeTransversePoisson1)
             self.vpsSolver.setProperty(compositeTransversePoisson2)
             
+
+            # set the field orientation, the objectID corresponds to layer angle, i.e, 0,90,45,-45
+            self.vpsSolver.setField(self.fibreOrientation0,FieldID.FID_FibreOrientation,0,0)
+            self.vpsSolver.setField(self.fibreOrientation90,FieldID.FID_FibreOrientation,0,90)
+            self.vpsSolver.setField(self.fibreOrientation45,FieldID.FID_FibreOrientation,0,45)
+            self.vpsSolver.setField(self.fibreOrientation_45,FieldID.FID_FibreOrientation,0,-45)
+
             
         except Exception as err:
             print ("Setting Vps params failed: " + repr(err));
@@ -237,6 +277,49 @@ class Airbus_Workflow_14(Workflow.Workflow):
             print ("Error:" + repr(err))
             self.terminate()
 
+    def filterField(sourceField, filterField, tresholdValue):
+        # filter composite part
+        # sourceField: source field from which subFIELD IS CREATED
+        # filterField: Field defining quantintity based on which the filtering is done
+        # tresholdValue: Only parts of source field with filterField = tresholdValue will be returned
+        # return: field defined on submesh of sourceField, where filterField==tresholdValue
+        fmesh = sourceField.getMesh()
+        targetMesh = Mesh.UnstructuredMesh()
+        targetCells = []
+        targetVertices = []
+        nodeMap = [-1] * fmesh.getNumberOfVertices()
+        
+        fvalues = []
+        for iv in fmesh.vertices():
+            n = iv.getNumber()
+            if (abs(filterField.getVertexValue(n).getValue()[0] - tresholdValue) < 1.e-3):
+                nn = copy.deepcopy(iv)
+                nn.number = len(targetVertices)
+                nodeMap[n] = nn.number
+                targetVertices.append(nn)
+                fvalues.append(sourceField.getVertexValue(n).getValue())
+                
+        for icell in fmesh.cellsq():
+            # determine if icell belongs to composite domain
+            if (nodeMap[icell.getVertices()[0].getNumber()] >= 0):
+                # cell belonging to composite
+                c = icell.copy()
+                # append all cell vertices
+                cvertices = []
+                for i in range(len(c.vertices)):
+                    # inum = c.vertices[i].getNumber()
+                    inum = c.vertices[i]
+                    cvertices.append(nodeMap[inum])
+                    c.vertices = cvertices
+                    targetCells.append(c)
+
+        targetMesh.setup(targetVertices, targetCells)
+        targetField = Field.Field(targetMesh, FieldID.FID_FibreOrientation, sourceField.getValueType(),
+                              sourceField.getUnits(), sourceField.getTime(), values=fvalues,
+                              fieldType=sourceField.getFieldType(), objectID=sourceField.getObjectID())
+        return targetField
+
+            
 
 
     def getCriticalTimeStep(self):
@@ -247,7 +330,7 @@ class Airbus_Workflow_14(Workflow.Workflow):
         #self.thermalAppRec.terminateAll()
         self.digimatSolver.terminate()
         self.vpsSolver.terminate()
-        super(Airbus_Workflow_14, self).terminate()
+        super(Airbus_Workflow_9p, self).terminate()
 
     def getApplicationSignature(self):
         return "Composelector workflow 1.0"
@@ -292,7 +375,7 @@ def workflow(inputGUID, execGUID):
         inclusionAspectRatio = 1
         
         try:
-            workflow = Airbus_Workflow_14()
+            workflow = Airbus_Workflow_9p()
             workflowMD = {
                 'Execution': {
                     'ID': '1',
@@ -348,7 +431,7 @@ def workflow(inputGUID, execGUID):
                 return ImportHelper
             
         except APIError.APIError as err:
-            print ("Mupif API for Airubu_Workflow_3: " + repr(err))
+            print ("Mupif API for Airubu_Workflow_9p: " + repr(err))
         except Exception as err:
             print ("Error: " + repr(err))
         except:

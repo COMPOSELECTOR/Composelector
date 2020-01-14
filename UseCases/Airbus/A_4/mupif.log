@@ -1,12 +1,44 @@
-2019-12-15 00:13:55 INFO:A_4.py:38 Setting Workflow basic metadata 
+2020-01-14 10:19:23 INFO:A_4.py:38 Setting Workflow basic metadata 
 
-2019-12-15 00:13:55 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+2020-01-14 10:19:23 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
 
-2019-12-15 00:13:55 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.54 
+2020-01-14 10:19:23 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
 
-2019-12-15 00:13:55 INFO:PyroUtil.py:556 Located Job Manager Abaqus@Mupif.LIST at: 172.30.0.163 44385 None None 
+2020-01-14 10:19:23 INFO:PyroUtil.py:556 Located Job Manager Abaqus@Mupif.LIST at: 172.30.0.163 44385 None None 
 
-2019-12-15 00:13:55 DEBUG:PyroUtil.py:252 Application Abaqus@Mupif.LIST, found URI PYRO:obj_4e576cc410bc44ecb934acb54e944692@172.30.0.163:44385 on ('172.30.0.163', 44385, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f97971b8d68; connected; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+2020-01-14 10:19:23 DEBUG:PyroUtil.py:252 Application Abaqus@Mupif.LIST, found URI PYRO:obj_4766d4ed19d847299a107435dd297b0b@172.30.0.163:44385 on ('172.30.0.163', 44385, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fa81d0fbcf8; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
 
-2019-12-15 00:13:55 INFO:PyroUtil.py:260 Connecting to application Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7f97971b8e48; not connected; for PYRO:obj_4e576cc410bc44ecb934acb54e944692@172.30.0.163:44385> 
+2020-01-14 10:19:23 INFO:PyroUtil.py:260 Connecting to application Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7fa81d10cf28; not connected; for PYRO:obj_4766d4ed19d847299a107435dd297b0b@172.30.0.163:44385> 
+
+2020-01-14 10:19:24 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application Abaqus@Mupif.LIST 
+
+2020-01-14 10:19:24 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:19:30 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '21@Abaqus@Mupif.LIST', 9270) 
+
+2020-01-14 10:19:30 INFO:PyroUtil.py:638 Scenario: Connecting to 21@Abaqus@Mupif.LIST 9270 
+
+2020-01-14 10:19:30 DEBUG:PyroUtil.py:252 Application 21@Abaqus@Mupif.LIST, found URI PYRO:obj_b5de525ad9bc43ac9b5b16b5c24ebbb2@172.30.0.163:9270 on ('172.30.0.163', 9270, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7fa81d0fbcf8; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:19:30 INFO:PyroUtil.py:260 Connecting to application 21@Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7fa81d10cf98; not connected; for PYRO:obj_b5de525ad9bc43ac9b5b16b5c24ebbb2@172.30.0.163:9270> 
+
+2020-01-14 10:19:31 DEBUG:PyroUtil.py:262 Connected to LIST_Abaqus_API with the application 21@Abaqus@Mupif.LIST 
+
+2020-01-14 10:19:31 INFO:A_4.py:119 Created Abaqus job 
+
+2020-01-14 10:19:31 INFO:A_4.py:125 Working Abaqus solver on server LIST_Abaqus_API 
+
+2020-01-14 10:19:31 INFO:A_4.py:353 Uploading input files to server 
+
+2020-01-14 10:20:21 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:20:21 INFO:A_4.py:180 Running Abaqus 
+
+2020-01-14 10:32:30 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 21@Abaqus@Mupif.LIST on Abaqus@Mupif.LIST 
+
+2020-01-14 10:32:30 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:32:30 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:32:30 INFO:A_4.py:384 Process complete 
 

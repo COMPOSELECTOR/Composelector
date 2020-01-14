@@ -1,0 +1,44 @@
+2020-01-14 10:12:03 INFO:A_1.py:30 Setting Workflow basic metadata 
+
+2020-01-14 10:12:03 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 10:12:03 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 10:12:03 INFO:PyroUtil.py:556 Located Job Manager MUL2.JobManager@UseCase1 at: 172.30.0.172 44389 None None 
+
+2020-01-14 10:12:03 DEBUG:PyroUtil.py:252 Application MUL2.JobManager@UseCase1, found URI PYRO:obj_d5b2018cc46f42fd99418801bee3e2ca@172.30.0.172:44389 on ('172.30.0.172', 44389, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f09ddd24780; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:12:03 INFO:PyroUtil.py:260 Connecting to application MUL2.JobManager@UseCase1 with <Pyro4.core.Proxy at 0x7f09ddd24c18; not connected; for PYRO:obj_d5b2018cc46f42fd99418801bee3e2ca@172.30.0.172:44389> 
+
+2020-01-14 10:12:04 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application MUL2.JobManager@UseCase1 
+
+2020-01-14 10:12:04 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:12:05 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '20@MUL2.JobManager@UseCase1', 8916) 
+
+2020-01-14 10:12:05 INFO:PyroUtil.py:638 Scenario: Connecting to 20@MUL2.JobManager@UseCase1 8916 
+
+2020-01-14 10:12:05 DEBUG:PyroUtil.py:252 Application 20@MUL2.JobManager@UseCase1, found URI PYRO:obj_fc4d7e6ceb8a482ea7d86427d4e9ed80@172.30.0.172:8916 on ('172.30.0.172', 8916, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f09ddd24780; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:12:05 INFO:PyroUtil.py:260 Connecting to application 20@MUL2.JobManager@UseCase1 with <Pyro4.core.Proxy at 0x7f09ddd3a978; not connected; for PYRO:obj_fc4d7e6ceb8a482ea7d86427d4e9ed80@172.30.0.172:8916> 
+
+2020-01-14 10:12:05 DEBUG:PyroUtil.py:262 Connected to MUL2_FEM with the application 20@MUL2.JobManager@UseCase1 
+
+2020-01-14 10:12:05 INFO:A_1.py:92 Created mul2 job 
+
+2020-01-14 10:12:05 INFO:A_1.py:98 Working mul2 solver on server MUL2_FEM 
+
+2020-01-14 10:12:06 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:12:06 INFO:A_1.py:153 Running mul2 
+
+2020-01-14 10:13:06 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 20@MUL2.JobManager@UseCase1 on MUL2.JobManager@UseCase1 
+
+2020-01-14 10:13:06 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:13:06 INFO:A_1.py:262 Requested KPI : Buckling Load: 10001.256 N 
+
+2020-01-14 10:13:06 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:13:06 INFO:A_1.py:266 Process complete 
+

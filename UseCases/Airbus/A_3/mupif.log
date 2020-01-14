@@ -1,0 +1,78 @@
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 10:16:21 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f52ea7f98d0; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:16:21 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f52ea7f9dd8; not connected; for PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382> 
+
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+
+2020-01-14 10:16:21 INFO:PyroUtil.py:556 Located Job Manager MUL2.JobManager@UseCase1 at: 172.30.0.172 44389 None None 
+
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:252 Application MUL2.JobManager@UseCase1, found URI PYRO:obj_d5b2018cc46f42fd99418801bee3e2ca@172.30.0.172:44389 on ('172.30.0.172', 44389, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f52ea7f98d0; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:16:21 INFO:PyroUtil.py:260 Connecting to application MUL2.JobManager@UseCase1 with <Pyro4.core.Proxy at 0x7f52ea7e4da0; not connected; for PYRO:obj_d5b2018cc46f42fd99418801bee3e2ca@172.30.0.172:44389> 
+
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application MUL2.JobManager@UseCase1 
+
+2020-01-14 10:16:21 INFO:A_3.py:107 Created LAMMPS job 
+
+2020-01-14 10:16:21 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:16:22 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '2@eX_DigimatMF_JobManager', 9001) 
+
+2020-01-14 10:16:22 INFO:PyroUtil.py:638 Scenario: Connecting to 2@eX_DigimatMF_JobManager 9001 
+
+2020-01-14 10:16:22 DEBUG:PyroUtil.py:252 Application 2@eX_DigimatMF_JobManager, found URI PYRO:obj_ad8c32bb50f548d1973074a7669a97c2@172.30.0.112:9001 on ('172.30.0.112', 9001, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f52ea7f98d0; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:16:22 INFO:PyroUtil.py:260 Connecting to application 2@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f52ea7e6160; not connected; for PYRO:obj_ad8c32bb50f548d1973074a7669a97c2@172.30.0.112:9001> 
+
+2020-01-14 10:16:23 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 2@eX_DigimatMF_JobManager 
+
+2020-01-14 10:16:23 INFO:A_3.py:110 Created digimat job 
+
+2020-01-14 10:16:23 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:16:24 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '22@MUL2.JobManager@UseCase1', 8918) 
+
+2020-01-14 10:16:24 INFO:PyroUtil.py:638 Scenario: Connecting to 22@MUL2.JobManager@UseCase1 8918 
+
+2020-01-14 10:16:24 DEBUG:PyroUtil.py:252 Application 22@MUL2.JobManager@UseCase1, found URI PYRO:obj_df615325db044ba888e1ba46ca81db0d@172.30.0.172:8918 on ('172.30.0.172', 8918, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f52ea7f98d0; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:16:24 INFO:PyroUtil.py:260 Connecting to application 22@MUL2.JobManager@UseCase1 with <Pyro4.core.Proxy at 0x7f52ea7e6550; not connected; for PYRO:obj_df615325db044ba888e1ba46ca81db0d@172.30.0.172:8918> 
+
+2020-01-14 10:16:24 DEBUG:PyroUtil.py:262 Connected to MUL2_FEM with the application 22@MUL2.JobManager@UseCase1 
+
+2020-01-14 10:16:24 INFO:A_3.py:112 Created mul2 job 
+
+2020-01-14 10:16:24 INFO:A_3.py:118 Working lammps solver on server Model 
+
+2020-01-14 10:16:24 INFO:A_3.py:120 Working digimat solver on server DigimatApplication 
+
+2020-01-14 10:16:24 INFO:A_3.py:122 Working mul2 solver on server MUL2_FEM 
+
+2020-01-14 10:16:24 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:16:35 INFO:A_3.py:214 Running digimat 
+
+2020-01-14 10:16:37 INFO:A_3.py:275 Running mul2 
+
+2020-01-14 10:17:32 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:17:32 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 2@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+
+2020-01-14 10:17:32 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 22@MUL2.JobManager@UseCase1 on MUL2.JobManager@UseCase1 
+
+2020-01-14 10:17:32 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:17:32 INFO:A_3.py:424 Requested KPI : Buckling Load: 10001.256 N 
+
+2020-01-14 10:17:32 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:17:32 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:17:32 INFO:A_3.py:426 Process complete 
+

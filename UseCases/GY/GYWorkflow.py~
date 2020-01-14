@@ -28,7 +28,10 @@ abaqusJobManName='Abaqus@Mupif.LIST'
 ###########################################################################################
 ### START ::: THIS PART CAN BE REMOVED ONCE USER-DEFINED PROP IDs ARE INTEGRATED INTO MUPIF
 # this directory definition is required for import user-defined property IDs
+sys.path.append('../API')
 # data ID definitions not yet incorporated into Mupif
+from customDataID import MyPropertyID, MyFieldID
+import DigimatPropertyID
 ### END ::: THIS PART CAN BE REMOVED ONCE USER-DEFINED PROP IDs ARE INTEGRATED INTO MUPIF
 #########################################################################################
 
@@ -185,7 +188,7 @@ class LISTWorkflow(Workflow.Workflow):
             self.terminate()
             
     def terminate(self):
-        self.digimatApp.terminate()
+        self.digiamatApp.terminate()
         self.abaqusApp.terminate()
         print("\nterminate \n=======")
         self.digimatJobMan.terminate()
@@ -228,23 +231,23 @@ def workflow_execution(inputGUID, execGUID):
         
         workflowMD = workflowID.copy()
         workflowMD['Inputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionYoung',  'Name': 'Inclusion Young', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionPoisson',  'Name': 'Inclusion Poisson', 'Units': 'none', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionVolumeFraction',  'Name': 'Volume Fraction', 'Units': 'none', 'Required': True},
-        ]
+                {'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionYoung',  'Name': 'Inclusion Young', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionPoisson',  'Name': 'Inclusion Poisson', 'Units': 'none', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionVolumeFraction',  'Name': 'Volume Fraction', 'Units': 'none', 'Required': True},
+                       ]
         workflowMD['Outputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
-        ]
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
+                       ]
         abaqusAppMD=workflowID.copy()
         abaqusAppMD['Inputs'] = [
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Hyper1',  'Name': 'E1', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Hyper1',  'Name': 'E1', 'Units': 'MPa', 'Required': True},
                        ]
         abaqusAppMD['Outputs'] = [
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
                        ]
         abaqusAppMD['refPoint'] = 'RF-1'
         abaqusAppMD['componentID'] = 1
@@ -258,22 +261,22 @@ def workflow_execution(inputGUID, execGUID):
         print('Initializing Digimat')
         digimatAppMD=workflowID.copy()
         digimatAppMD['Inputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
+            {'Type': 'mupif.Property', 'Type_ID': 'mupif.DigimatPropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
+            {'Type': 'mupif.Property', 'Type_ID': 'mupif.DigimatPropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
             {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_InclusionYoung',  'Name': 'Inclusion Young', 'Units': 'MPa', 'Required': True},
             {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_InclusionPoisson',  'Name': 'Inclusion Poisson', 'Units': 'none', 'Required': True},
             {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_InclusionVolumeFraction',  'Name': 'Volume Fraction', 'Units': 'none', 'Required': True},
         ]
         digimatAppMD['Outputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeStress11Tensor',  'Name': 'axial stress vector', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeStrain11Tensor',  'Name': 'axial strain vector', 'Units': 'none', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeStrain22Tensor',  'Name': 'transverse stress vector', 'Units': 'none', 'Required': True},
+            {'Type': 'mupif.Property', 'Type_ID': 'mupif.DigimatPropertyID.PID_CompositeStress11Tensor',  'Name': 'axial stress vector', 'Units': 'MPa', 'Required': True},
+            {'Type': 'mupif.Property', 'Type_ID': 'mupif.DigimatPropertyID.PID_CompositeStrain11Tensor',  'Name': 'axial strain vector', 'Units': 'none', 'Required': True},
+            {'Type': 'mupif.Property', 'Type_ID': 'mupif.DigimatPropertyID.PID_CompositeStrain22Tensor',  'Name': 'transverse stress vector', 'Units': 'none', 'Required': True},
         ]
         workflow.digimatApp.initialize(metaData=digimatAppMD, validateMetaData = False)
 		
         # set hyperelastic properties for DigimatMF
-        workflow.digimatApp.setProperty(Property.ConstantProperty(tuple(MatrixOgdenModulus_values), PropertyID.PID_MatrixOgdenModulus, ValueType.Scalar, "MPa"))
-        workflow.digimatApp.setProperty(Property.ConstantProperty(tuple(MatrixOgdenExponent_values), PropertyID.PID_MatrixOgdenExponent, ValueType.Scalar, "none"))
+        workflow.digimatApp.setProperty(Property.ConstantProperty(tuple(MatrixOgdenModulus_values), DigimatPropertyID.PID_MatrixOgdenModulus, ValueType.Scalar, "MPa"))
+        workflow.digimatApp.setProperty(Property.ConstantProperty(tuple(MatrixOgdenExponent_values), DigimatPropertyID.PID_MatrixOgdenExponent, ValueType.Scalar, "none"))
 
         # set inclusion properties for DigimatMF
         workflow.digimatApp.setProperty(Property.ConstantProperty(InclusionModulus, PropertyID.PID_InclusionYoung, ValueType.Scalar, "MPa"))
@@ -285,14 +288,14 @@ def workflow_execution(inputGUID, execGUID):
         workflow.digimatApp.solveStep(None)
 
         # get stress strain data from Digimat
-        stress = workflow.digimatApp.getProperty(PropertyID.PID_CompositeStress11Tensor).getValue()
-        axistrain =  workflow.digimatApp.getProperty(PropertyID.PID_CompositeStrain11Tensor).getValue()
-        transtrain  = workflow.digimatApp.getProperty(PropertyID.PID_CompositeStrain22Tensor).getValue()
+        stress = workflow.digimatApp.getProperty(DigimatPropertyID.PID_CompositeStress11Tensor).getValue()
+        axistrain =  workflow.digimatApp.getProperty(DigimatPropertyID.PID_CompositeStrain11Tensor).getValue()
+        transtrain  = workflow.digimatApp.getProperty(DigimatPropertyID.PID_CompositeStrain22Tensor).getValue()
 		
         ###########################################################################################
         ### START ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
         # select input file location: True = application server, False: control script computer
-        filesend = False
+        filesend = True
 
         print('Initializing Abaqus')
         # Define server path of Abaqus input files
@@ -303,15 +306,15 @@ def workflow_execution(inputGUID, execGUID):
             inpDir2 = os.path.abspath('./inputFiles')
 
 #        # identify Abaqus input files
-        try:
-            inpFiles2 = []
-            for ext in ('*.inp', '*.env'):
-                if ext == '*.inp':
-                    ifile = glob.glob(os.path.join(inpDir2, ext))[0]
-                    ifile = os.path.basename(ifile)
-                    inpFiles2.extend(glob.glob(os.path.join(inpDir2, ext)))
-        except Exception as err:
-            print("Error:" + repr(err))
+#        try:
+#            inpFiles2 = []
+#            for ext in ('*.inp', '*.env'):
+#                if ext == '*.inp':
+#                    ifile = glob.glob(os.path.join(inpDir2, ext))[0]
+#                    ifile = os.path.basename(ifile)
+#                inpFiles2.extend(glob.glob(os.path.join(inpDir2, ext)))
+#        except Exception as err:
+#            print("Error:" + repr(err))
         
         # identify Abaqus input files
         try:
@@ -381,7 +384,7 @@ def workflow_execution(inputGUID, execGUID):
         print('required PropIDs',workflow.CompulsoryPropIDs)
         
         print("Setting Hyper Data")
-        hyperdata=Property.ConstantProperty(curve,PropertyID.PID_Hyper1, ValueType.Vector, 'none')
+        hyperdata=Property.ConstantProperty(curve,MyPropertyID.PID_Hyper1, ValueType.Vector, 'none')
         workflow.setProperty(hyperdata)
         print("Hyper Data set")
         

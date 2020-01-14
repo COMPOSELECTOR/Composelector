@@ -24,15 +24,6 @@ hkey = 'mupif-secret-key'
 cmbsfeJobManName='CmbsFE@Mupif.LIST'
 abaqusJobManName='Abaqus@Mupif.LIST'
 
-###########################################################################################
-### START ::: THIS PART CAN BE REMOVED ONCE USER-DEFINED PROP IDs ARE INTEGRATED INTO MUPIF
-# this directory definition is required for import user-defined property IDs
-sys.path.append('../API')
-# data ID definitions not yet incorporated into Mupif
-from customDataID import MyPropertyID, MyFieldID
-import DigimatPropertyID
-### END ::: THIS PART CAN BE REMOVED ONCE USER-DEFINED PROP IDs ARE INTEGRATED INTO MUPIF
-#########################################################################################
 
 sys.path.append('../abaqusServer')
 sys.path.append('../cmbsfeServer')
@@ -344,10 +335,10 @@ def workflow_execution(inputGUID, execGUID):
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_ShearModulus23',  'Name': 'inclusionShear23', 'Units': 'MPa', 'Required': True},
                        ]
         workflowMD['Outputs'] = [
-                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Stiffness',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_maxDisplacement',  'Name': 'max. displacement', 'Units': 'mm', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_maxMisesStress',  'Name': 'max. von Mises Stress', 'Units': 'MPa', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_maxPrincipalStress',  'Name': 'max. principal Stress', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Stiffness',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_maxDisplacement',  'Name': 'max. displacement', 'Units': 'mm', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_maxMisesStress',  'Name': 'max. von Mises Stress', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_maxPrincipalStress',  'Name': 'max. principal Stress', 'Units': 'MPa', 'Required': True},
                        ]
 #        (maxMisesStress, maxDeflection, maxPrincipalStress, stiffness) = KPIs
 

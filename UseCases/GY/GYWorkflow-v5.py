@@ -28,7 +28,10 @@ abaqusJobManName='Abaqus@Mupif.LIST'
 ###########################################################################################
 ### START ::: THIS PART CAN BE REMOVED ONCE USER-DEFINED PROP IDs ARE INTEGRATED INTO MUPIF
 # this directory definition is required for import user-defined property IDs
+sys.path.append('../API')
 # data ID definitions not yet incorporated into Mupif
+from customDataID import MyPropertyID, MyFieldID
+import DigimatPropertyID
 ### END ::: THIS PART CAN BE REMOVED ONCE USER-DEFINED PROP IDs ARE INTEGRATED INTO MUPIF
 #########################################################################################
 
@@ -36,6 +39,11 @@ log = logging.getLogger()
 
 start = timeT.time()
 log.info('Timer started')
+
+#Read int for mode as number behind '-m' argument: 0-local (default), 1-ssh, 2-VPN 
+mode = argparse.ArgumentParser(parents=[Util.getParentParser()]).parse_args().mode
+
+sys.path.append('../abaqusServer')
 
 class LISTWorkflow(Workflow.Workflow):
         
@@ -91,30 +99,29 @@ class LISTWorkflow(Workflow.Workflow):
         ns = PyroUtil.connectNameServer(nshost=nshost, nsport=nsport, hkey=hkey)
         log.info('**** nameserver connected')
 #       connect to JobManager running on (remote) server
-        print('**** Abaqus jobmanager',sshContext)
-        self.abaqusJobMan = PyroUtil.connectJobManager(ns,abaqusJobManName, hkey,sshContext)
+        self.JobMan3 = PyroUtil.connectJobManager(ns,'Abaqus@Mupif.LIST', hkey,sshContext)
         log.info('**** Abaqus jobmanager found')
-        self.abaqusApp = None
+        self.app3 = None
+
         print('**** Digimat jobmanager')
-        self.digimatJobMan = PyroUtil.connectJobManager(ns,digimatJobManName, hkey,sshContext)
-        self.digimatApp = None
+        self.JobMan2 = PyroUtil.connectJobManager(ns,'eX_DigimatMF_GYR_JobManager', hkey,sshContext)
+        self.app2 = None
         log.info('**** Digimat jobmanager found')
 #       allocate the application instances
-#print('**** creating job on', jobManName)
         try:
             print('**** Creating job 2 : DIGIMAT-MF')
-            self.digimatApp = PyroUtil.allocateApplicationWithJobManager( ns, self.digimatJobMan, None, hkey)
+            self.app2 = PyroUtil.allocateApplicationWithJobManager( ns, self.JobMan2, None, hkey, sshContext)
             log.info('Created job 2 : DIGIMAT-MF')
 
             print('**** Creating job 3 : ABAQUS')
-            self.abaqusApp = PyroUtil.allocateApplicationWithJobManager( ns, self.abaqusJobMan, None, hkey)
+            self.app3 = PyroUtil.allocateApplicationWithJobManager( ns, self.JobMan3, None, hkey, sshContext)
             log.info('Created job 3 : ABAQUS')
 
         except Exception as e:
             log.exception(e)
         else:
-            if (self.abaqusApp != None):
-                SolverSignature=self.abaqusApp.getApplicationSignature()
+            if (self.app3 != None):
+                SolverSignature=self.app3.getApplicationSignature()
                 log.info("*** Working ABAQUS solver on server " + SolverSignature)
             else:
                 log.debug("Connection to server failed, exiting")
@@ -166,12 +173,12 @@ class LISTWorkflow(Workflow.Workflow):
         try:
             for propID in self.inputPropIDs:
                 property = self.inputProps[propID]
-                self.abaqusApp.setProperty(property)
+                self.app3.setProperty(property)
                 
             try :
                 istep = TimeStep.TimeStep(1., 1., 1.,'s',1)
                 print('ABAQUS solve',istep)
-                self.abaqusApp.solveStep(istep, stageID=1, runInBackground=False)
+                self.app3.solveStep(istep, stageID=1, runInBackground=False)
                 print('ABAQUS solved')
             except Exception as e:
                 print("\n An exception was thrown! \n")
@@ -185,16 +192,21 @@ class LISTWorkflow(Workflow.Workflow):
             self.terminate()
             
     def terminate(self):
-        self.digimatApp.terminate()
-        self.abaqusApp.terminate()
+        self.app2.terminate()
+        self.app3.terminate()
         print("\nterminate \n=======")
-        self.digimatJobMan.terminate()
-        self.abaqusJobMan.terminate()
+        self.JobMan2.terminate()
+        self.JobMan3.terminate()
 
+#        if mode == 1:
+#            self.appsTunnel.terminate()
+        
+#        if mode == 1:
+#            super(LISTWorkflow, self).terminate()
         super(LISTWorkflow, self).terminate()
 
     def getCriticalTimeStep(self):
-        return min(self.abaqusApp.getCriticalTimeStep(),self.digimatApp.getCriticalTimeStep())
+        return min(self.app3.getCriticalTimeStep(),self.app2.getCriticalTimeStep())
         
     def getApplicationSignature(self):
         return "LIST Workflow"
@@ -228,26 +240,26 @@ def workflow_execution(inputGUID, execGUID):
         
         workflowMD = workflowID.copy()
         workflowMD['Inputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionYoung',  'Name': 'Inclusion Young', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionPoisson',  'Name': 'Inclusion Poisson', 'Units': 'none', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionVolumeFraction',  'Name': 'Volume Fraction', 'Units': 'none', 'Required': True},
-        ]
+                {'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionYoung',  'Name': 'Inclusion Young', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionPoisson',  'Name': 'Inclusion Poisson', 'Units': 'none', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_InclusionVolumeFraction',  'Name': 'Volume Fraction', 'Units': 'none', 'Required': True},
+                       ]
         workflowMD['Outputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
-        ]
-        abaqusAppMD=workflowID.copy()
-        abaqusAppMD['Inputs'] = [
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Hyper1',  'Name': 'E1', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
                        ]
-        abaqusAppMD['Outputs'] = [
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
+        app3MD=workflowID.copy()
+        app3MD['Inputs'] = [
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Hyper1',  'Name': 'E1', 'Units': 'MPa', 'Required': True},
                        ]
-        abaqusAppMD['refPoint'] = 'RF-1'
-        abaqusAppMD['componentID'] = 1
+        app3MD['Outputs'] = [
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Footprint',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'MyPropertyID.PID_Braking_Force',  'Name': 'Braking Force', 'Units': 'N', 'Required': True},
+                       ]
+        app3MD['refPoint'] = 'RF-1'
+        app3MD['componentID'] = 1
  
         workflow.initialize(metaData=workflowMD )
         print('**** usecase metadata')
@@ -256,38 +268,38 @@ def workflow_execution(inputGUID, execGUID):
 
         # initialize DigimatMF
         print('Initializing Digimat')
-        digimatAppMD=workflowID.copy()
-        digimatAppMD['Inputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
+        app2MD=workflowID.copy()
+        app2MD['Inputs'] = [
+            #{'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_MatrixOgdenModulus',  'Name': 'Ogden Moduli', 'Units': 'MPa', 'Required': True},
+            #{'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_MatrixOgdenExponent',  'Name': 'Ogden Exponent', 'Units': 'none', 'Required': True},
             {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_InclusionYoung',  'Name': 'Inclusion Young', 'Units': 'MPa', 'Required': True},
             {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_InclusionPoisson',  'Name': 'Inclusion Poisson', 'Units': 'none', 'Required': True},
             {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_InclusionVolumeFraction',  'Name': 'Volume Fraction', 'Units': 'none', 'Required': True},
-        ]
-        digimatAppMD['Outputs'] = [
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeStress11Tensor',  'Name': 'axial stress vector', 'Units': 'MPa', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeStrain11Tensor',  'Name': 'axial strain vector', 'Units': 'none', 'Required': True},
-            {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeStrain22Tensor',  'Name': 'transverse stress vector', 'Units': 'none', 'Required': True},
-        ]
-        workflow.digimatApp.initialize(metaData=digimatAppMD, validateMetaData = False)
+                       ]
+        app2MD['Outputs'] = [
+            #{'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_CompositeStress11Tensor',  'Name': 'axial stress vector', 'Units': 'MPa', 'Required': True},
+            #{'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_CompositeStrain11Tensor',  'Name': 'axial strain vector', 'Units': 'none', 'Required': True},
+            #{'Type': 'mupif.Property', 'Type_ID': 'DigimatPropertyID.PID_CompositeStrain22Tensor',  'Name': 'transverse stress vector', 'Units': 'none', 'Required': True},
+                       ]
+        workflow.app2.initialize(metaData=app2MD, validateMetaData = False)
 		
         # set hyperelastic properties for DigimatMF
-        workflow.digimatApp.setProperty(Property.ConstantProperty(tuple(MatrixOgdenModulus_values), PropertyID.PID_MatrixOgdenModulus, ValueType.Scalar, "MPa"))
-        workflow.digimatApp.setProperty(Property.ConstantProperty(tuple(MatrixOgdenExponent_values), PropertyID.PID_MatrixOgdenExponent, ValueType.Scalar, "none"))
+        workflow.app2.setProperty(Property.ConstantProperty(tuple(MatrixOgdenModulus_values), DigimatPropertyID.PID_MatrixOgdenModulus, ValueType.Scalar, "MPa"))
+        workflow.app2.setProperty(Property.ConstantProperty(tuple(MatrixOgdenExponent_values), DigimatPropertyID.PID_MatrixOgdenExponent, ValueType.Scalar, "none"))
 
         # set inclusion properties for DigimatMF
-        workflow.digimatApp.setProperty(Property.ConstantProperty(InclusionModulus, PropertyID.PID_InclusionYoung, ValueType.Scalar, "MPa"))
-        workflow.digimatApp.setProperty(Property.ConstantProperty(InclusionPoisson, PropertyID.PID_InclusionPoisson, ValueType.Scalar, "none"))
-        workflow.digimatApp.setProperty(Property.ConstantProperty(Volumefraction, PropertyID.PID_InclusionVolumeFraction, ValueType.Scalar, "none"))
+        workflow.app2.setProperty(Property.ConstantProperty(InclusionModulus, PropertyID.PID_InclusionYoung, ValueType.Scalar, "MPa"))
+        workflow.app2.setProperty(Property.ConstantProperty(InclusionPoisson, PropertyID.PID_InclusionPoisson, ValueType.Scalar, "none"))
+        workflow.app2.setProperty(Property.ConstantProperty(Volumefraction, PropertyID.PID_InclusionVolumeFraction, ValueType.Scalar, "none"))
 
         # solve DigimatMF
         print('Solve Digimat')
-        workflow.digimatApp.solveStep(None)
+        workflow.app2.solveStep(None)
 
         # get stress strain data from Digimat
-        stress = workflow.digimatApp.getProperty(PropertyID.PID_CompositeStress11Tensor).getValue()
-        axistrain =  workflow.digimatApp.getProperty(PropertyID.PID_CompositeStrain11Tensor).getValue()
-        transtrain  = workflow.digimatApp.getProperty(PropertyID.PID_CompositeStrain22Tensor).getValue()
+        stress = workflow.app2.getProperty(DigimatPropertyID.PID_CompositeStress11Tensor).getValue()
+        axistrain =  workflow.app2.getProperty(DigimatPropertyID.PID_CompositeStrain11Tensor).getValue()
+        transtrain  = workflow.app2.getProperty(DigimatPropertyID.PID_CompositeStrain22Tensor).getValue()
 		
         ###########################################################################################
         ### START ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
@@ -309,7 +321,7 @@ def workflow_execution(inputGUID, execGUID):
                 if ext == '*.inp':
                     ifile = glob.glob(os.path.join(inpDir2, ext))[0]
                     ifile = os.path.basename(ifile)
-                    inpFiles2.extend(glob.glob(os.path.join(inpDir2, ext)))
+                inpFiles2.extend(glob.glob(os.path.join(inpDir2, ext)))
         except Exception as err:
             print("Error:" + repr(err))
         
@@ -328,18 +340,18 @@ def workflow_execution(inputGUID, execGUID):
         if filesend:
             print("$$$ Uploading input files from application server to workdir",ifile)
             try:
-                shutil.copy(os.path.join(inpDir2,"abaqus_v6.env"), workflow.abaqusJobMan.getJobWorkDir(workflow.abaqusApp.getJobID()))
+                shutil.copy(os.path.join(inpDir2,"abaqus_v6.env"), workflow.JobMan3.getJobWorkDir(workflow.app3.getJobID()))
                 for inpFile in inpFiles2:
-                    shutil.copy(inpFile, workflow.abaqusJobMan.getJobWorkDir(workflow.abaqusApp.getJobID()))
+                    shutil.copy(inpFile, workflow.JobMan3.getJobWorkDir(workflow.app3.getJobID()))
             except Exception as err:
                 print("Error:" + repr(err))
         else:
             print("$$$ Uploading input files from control computer to workdir",ifile)
             log.info("Uploading input files to server")
             try:
-                pf = workflow.abaqusJobMan.getPyroFile(workflow.abaqusApp.getJobID(), "abaqus_v6.env", 'wb')
+                pf = workflow.JobMan3.getPyroFile(workflow.app3.getJobID(), "abaqus_v6.env", 'wb')
                 PyroUtil.uploadPyroFile(os.path.join(inpDir2,"abaqus_v6.env"), pf, hkey)
-                mf = workflow.abaqusJobMan.getPyroFile(workflow.abaqusApp.getJobID(), ifile, 'wb')
+                mf = workflow.JobMan3.getPyroFile(workflow.app3.getJobID(), ifile, 'wb')
                 PyroUtil.uploadPyroFile(os.path.join(inpDir2,ifile), mf, hkey)
                 print("$$$ input files uploaded on server")
             except Exception as err:
@@ -371,21 +383,21 @@ def workflow_execution(inputGUID, execGUID):
         curve=tuple(stressstrain)
         # end of stress strain curve generation
 
-        workflow.abaqusApp.initialize(file = ifile, workdir=workflow.abaqusJobMan.getJobWorkDir(workflow.abaqusApp.getJobID()), metaData = abaqusAppMD)
+        workflow.app3.initialize(file = ifile, workdir=workflow.JobMan3.getJobWorkDir(workflow.app3.getJobID()), metaData = app3MD)
 
         # create list of compulsory input IDs from metadata
         workflow.CompulsoryPropIDs = {}
         print('create list of compulsory input IDs from metadata')
-        for data in workflow.abaqusApp.getMetadata("Inputs"):
+        for data in workflow.app3.getMetadata("Inputs"):
             workflow.CompulsoryPropIDs[eval(data['Type_ID'])] = (data['Name'], data['Units'])
         print('required PropIDs',workflow.CompulsoryPropIDs)
         
         print("Setting Hyper Data")
-        hyperdata=Property.ConstantProperty(curve,PropertyID.PID_Hyper1, ValueType.Vector, 'none')
+        hyperdata=Property.ConstantProperty(curve,MyPropertyID.PID_Hyper1, ValueType.Vector, 'none')
         workflow.setProperty(hyperdata)
         print("Hyper Data set")
         
-        workflow.abaqusApp.printMetadata() 
+        workflow.app3.printMetadata() 
 
         # solving the problem
         print("Solve workflow")
@@ -397,7 +409,8 @@ def workflow_execution(inputGUID, execGUID):
         # Macro-scale properties (KPIs)
         print("get KPIs from ABAQUS simulation")
         for propID in  workflow.outputPropIDs:
-            prop =  workflow.abaqusApp.getProperty(propID)
+            print ("huhu: "+str(propID))
+            prop =  workflow.app3.getProperty(propID)
             workflow.outputProps[propID] = prop
         print('KPIs',workflow.outputProps)
         print('KPIs done : OK')

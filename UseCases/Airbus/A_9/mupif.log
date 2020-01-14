@@ -1,0 +1,224 @@
+2020-01-14 10:51:34 INFO:A_9.py:32 Setting Workflow basic metadata 
+
+2020-01-14 10:51:34 INFO:A_9.py:93 Workflow initialization 
+
+2020-01-14 10:51:34 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 10:51:34 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 10:51:34 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2020-01-14 10:51:34 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f48beb518; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:51:34 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f5f48beb9b0; not connected; for PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382> 
+
+2020-01-14 10:51:35 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+
+2020-01-14 10:51:35 INFO:PyroUtil.py:556 Located Job Manager ESI_VPS_Jobmanager_MUPIF_v2.2 at: 172.30.0.91 44383 None None 
+
+2020-01-14 10:51:35 DEBUG:PyroUtil.py:252 Application ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383 on ('172.30.0.91', 44383, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f48beb518; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:51:35 INFO:PyroUtil.py:260 Connecting to application ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f5f1d3e5940; not connected; for PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383> 
+
+2020-01-14 10:51:35 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:51:35 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:51:36 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '8@eX_DigimatMF_JobManager', 9007) 
+
+2020-01-14 10:51:36 INFO:PyroUtil.py:638 Scenario: Connecting to 8@eX_DigimatMF_JobManager 9007 
+
+2020-01-14 10:51:36 DEBUG:PyroUtil.py:252 Application 8@eX_DigimatMF_JobManager, found URI PYRO:obj_b76319ebf9264b57928b85fc36c0dcdd@172.30.0.112:9007 on ('172.30.0.112', 9007, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f48beb518; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:51:36 INFO:PyroUtil.py:260 Connecting to application 8@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f5f1d3e5b00; not connected; for PYRO:obj_b76319ebf9264b57928b85fc36c0dcdd@172.30.0.112:9007> 
+
+2020-01-14 10:51:36 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 8@eX_DigimatMF_JobManager 
+
+2020-01-14 10:51:36 INFO:A_9.py:105 Created digimat job 
+
+2020-01-14 10:51:36 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:51:37 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '9@ESI_VPS_Jobmanager_MUPIF_v2.2', 9008) 
+
+2020-01-14 10:51:37 INFO:PyroUtil.py:638 Scenario: Connecting to 9@ESI_VPS_Jobmanager_MUPIF_v2.2 9008 
+
+2020-01-14 10:51:37 DEBUG:PyroUtil.py:252 Application 9@ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_dca737f95fe84f87b7402c76de9de027@172.30.0.91:9008 on ('172.30.0.91', 9008, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f48beb518; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:51:37 INFO:PyroUtil.py:260 Connecting to application 9@ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f5f1d3e5e10; not connected; for PYRO:obj_dca737f95fe84f87b7402c76de9de027@172.30.0.91:9008> 
+
+2020-01-14 10:51:37 DEBUG:PyroUtil.py:262 Connected to ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) with the application 9@ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:51:37 INFO:A_9.py:107 Created Vps job 
+
+2020-01-14 10:51:37 INFO:A_9.py:113 Working digimat solver on server DigimatApplication 
+
+2020-01-14 10:51:37 INFO:A_9.py:115 Working vps solver on server ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) 
+
+2020-01-14 10:51:37 INFO:A_9.py:120 Metadata were successfully validate 
+
+2020-01-14 10:51:37 INFO:A_9.py:131 Setting Execution Metadata of Digimat 
+
+2020-01-14 10:51:37 INFO:A_9.py:132 Setting Execution Metadata of Vps 
+
+2020-01-14 10:51:37 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:51:38 INFO:A_9.py:175 Running Digimat 
+
+2020-01-14 10:51:40 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 8@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+
+2020-01-14 10:51:45 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 9@ESI_VPS_Jobmanager_MUPIF_v2.2 on ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:51:46 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:51:46 INFO:A_9.py:236 Running Vps 
+
+2020-01-14 10:51:46 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:51:46 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:52:04 INFO:A_9.py:32 Setting Workflow basic metadata 
+
+2020-01-14 10:52:04 INFO:A_9.py:93 Workflow initialization 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 10:52:04 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33a278; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:04 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f5f1d33a710; not connected; for PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382> 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+
+2020-01-14 10:52:04 INFO:PyroUtil.py:556 Located Job Manager ESI_VPS_Jobmanager_MUPIF_v2.2 at: 172.30.0.91 44383 None None 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:252 Application ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383 on ('172.30.0.91', 44383, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33a278; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:04 INFO:PyroUtil.py:260 Connecting to application ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f5f1d33a898; not connected; for PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383> 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:52:04 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:52:11 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '9@eX_DigimatMF_JobManager', 9008) 
+
+2020-01-14 10:52:11 INFO:PyroUtil.py:638 Scenario: Connecting to 9@eX_DigimatMF_JobManager 9008 
+
+2020-01-14 10:52:11 DEBUG:PyroUtil.py:252 Application 9@eX_DigimatMF_JobManager, found URI PYRO:obj_5a226a3fdcc848f7ba28a95b7e00058d@172.30.0.112:9008 on ('172.30.0.112', 9008, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33a278; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:11 INFO:PyroUtil.py:260 Connecting to application 9@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f5f1d33ab38; not connected; for PYRO:obj_5a226a3fdcc848f7ba28a95b7e00058d@172.30.0.112:9008> 
+
+2020-01-14 10:52:11 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 9@eX_DigimatMF_JobManager 
+
+2020-01-14 10:52:11 INFO:A_9.py:105 Created digimat job 
+
+2020-01-14 10:52:11 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:52:12 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '10@ESI_VPS_Jobmanager_MUPIF_v2.2', 9009) 
+
+2020-01-14 10:52:12 INFO:PyroUtil.py:638 Scenario: Connecting to 10@ESI_VPS_Jobmanager_MUPIF_v2.2 9009 
+
+2020-01-14 10:52:12 DEBUG:PyroUtil.py:252 Application 10@ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_59ce078abb8041eca6523e687269d32e@172.30.0.91:9009 on ('172.30.0.91', 9009, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33a278; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:12 INFO:PyroUtil.py:260 Connecting to application 10@ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f5f1d33aef0; not connected; for PYRO:obj_59ce078abb8041eca6523e687269d32e@172.30.0.91:9009> 
+
+2020-01-14 10:52:12 DEBUG:PyroUtil.py:262 Connected to ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) with the application 10@ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:52:12 INFO:A_9.py:107 Created Vps job 
+
+2020-01-14 10:52:12 INFO:A_9.py:113 Working digimat solver on server DigimatApplication 
+
+2020-01-14 10:52:12 INFO:A_9.py:115 Working vps solver on server ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) 
+
+2020-01-14 10:52:13 INFO:A_9.py:120 Metadata were successfully validate 
+
+2020-01-14 10:52:13 INFO:A_9.py:131 Setting Execution Metadata of Digimat 
+
+2020-01-14 10:52:13 INFO:A_9.py:132 Setting Execution Metadata of Vps 
+
+2020-01-14 10:52:13 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:52:13 INFO:A_9.py:175 Running Digimat 
+
+2020-01-14 10:52:15 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 9@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+
+2020-01-14 10:52:20 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 10@ESI_VPS_Jobmanager_MUPIF_v2.2 on ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:52:21 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:52:21 INFO:A_9.py:236 Running Vps 
+
+2020-01-14 10:52:21 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:52:21 INFO:Model.py:496 Terminating model 
+
+2020-01-14 10:52:31 INFO:A_9.py:32 Setting Workflow basic metadata 
+
+2020-01-14 10:52:31 INFO:A_9.py:93 Workflow initialization 
+
+2020-01-14 10:52:31 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 10:52:32 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 10:52:32 INFO:PyroUtil.py:556 Located Job Manager eX_DigimatMF_JobManager at: 172.30.0.112 44382 None None 
+
+2020-01-14 10:52:32 DEBUG:PyroUtil.py:252 Application eX_DigimatMF_JobManager, found URI PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382 on ('172.30.0.112', 44382, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33d860; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:32 INFO:PyroUtil.py:260 Connecting to application eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f5f1d33dda0; not connected; for PYRO:obj_7db04ce6dc304145b7e2367443ea6e86@172.30.0.112:44382> 
+
+2020-01-14 10:52:32 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application eX_DigimatMF_JobManager 
+
+2020-01-14 10:52:32 INFO:PyroUtil.py:556 Located Job Manager ESI_VPS_Jobmanager_MUPIF_v2.2 at: 172.30.0.91 44383 None None 
+
+2020-01-14 10:52:32 DEBUG:PyroUtil.py:252 Application ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383 on ('172.30.0.91', 44383, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33d860; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:32 INFO:PyroUtil.py:260 Connecting to application ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f5f1d33df60; not connected; for PYRO:obj_a998a3f5f5c54e56976686d1d3bcd1fe@172.30.0.91:44383> 
+
+2020-01-14 10:52:32 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:52:32 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:52:33 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '10@eX_DigimatMF_JobManager', 9009) 
+
+2020-01-14 10:52:33 INFO:PyroUtil.py:638 Scenario: Connecting to 10@eX_DigimatMF_JobManager 9009 
+
+2020-01-14 10:52:33 DEBUG:PyroUtil.py:252 Application 10@eX_DigimatMF_JobManager, found URI PYRO:obj_a6cc6185627744c0bd4cc3a147818380@172.30.0.112:9009 on ('172.30.0.112', 9009, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33d860; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:33 INFO:PyroUtil.py:260 Connecting to application 10@eX_DigimatMF_JobManager with <Pyro4.core.Proxy at 0x7f5f1d33dcf8; not connected; for PYRO:obj_a6cc6185627744c0bd4cc3a147818380@172.30.0.112:9009> 
+
+2020-01-14 10:52:34 DEBUG:PyroUtil.py:262 Connected to DigimatApplication with the application 10@eX_DigimatMF_JobManager 
+
+2020-01-14 10:52:34 INFO:A_9.py:105 Created digimat job 
+
+2020-01-14 10:52:34 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 10:52:34 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '11@ESI_VPS_Jobmanager_MUPIF_v2.2', 9010) 
+
+2020-01-14 10:52:34 INFO:PyroUtil.py:638 Scenario: Connecting to 11@ESI_VPS_Jobmanager_MUPIF_v2.2 9010 
+
+2020-01-14 10:52:34 DEBUG:PyroUtil.py:252 Application 11@ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_dfd7fc209ae7465d8cff026f55d9d1a7@172.30.0.91:9010 on ('172.30.0.91', 9010, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f5f1d33d860; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 10:52:34 INFO:PyroUtil.py:260 Connecting to application 11@ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f5f1d33ab70; not connected; for PYRO:obj_dfd7fc209ae7465d8cff026f55d9d1a7@172.30.0.91:9010> 
+
+2020-01-14 10:52:35 DEBUG:PyroUtil.py:262 Connected to ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) with the application 11@ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-01-14 10:52:35 INFO:A_9.py:107 Created Vps job 
+
+2020-01-14 10:52:35 INFO:A_9.py:113 Working digimat solver on server DigimatApplication 
+
+2020-01-14 10:52:35 INFO:A_9.py:115 Working vps solver on server ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) 
+
+2020-01-14 10:52:35 INFO:A_9.py:120 Metadata were successfully validate 
+
+2020-01-14 10:52:35 INFO:A_9.py:131 Setting Execution Metadata of Digimat 
+
+2020-01-14 10:52:35 INFO:A_9.py:132 Setting Execution Metadata of Vps 
+
+2020-01-14 10:52:35 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 10:52:35 INFO:A_9.py:175 Running Digimat 
+
+2020-01-14 10:56:33 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 10@eX_DigimatMF_JobManager on eX_DigimatMF_JobManager 
+

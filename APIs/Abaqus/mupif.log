@@ -1,0 +1,24 @@
+2020-01-08 16:30:22 INFO:JobMan2cmd.py:20 JobMan2cmd: ['-p', '9553', '-j', '4@Mupif.Abaqus@Demo', '-n', 'None', '-d', '/home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/4@Mupif.Abaqus@Demo', '-s', '10001', '-i', '/home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus', '-c', 'mechanicalServerConfig', '-m', '2'] 
+
+2020-01-08 16:30:22 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-08 16:30:22 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-08 16:30:22 INFO:PyroUtil.py:338 Pyro4 daemon runs on 172.30.0.73:9553 using nathost None:None 
+
+2020-01-08 16:30:22 INFO:JobMan2cmd.py:92 Running daemon on hosts 172.30.0.73 port 9553 nathost None natport None hkey mupif-secret-key 
+
+2020-01-08 16:30:22 INFO:JobMan2cmd.py:97 Initializing application with initial file input.in and workdir /home/nitram/Documents/work/MUPIF/Workflows/Composelector/APIs/Abaqus/mechanicalWorkDir/4@Mupif.Abaqus@Demo 
+
+2020-01-08 16:30:22 INFO:JobMan2cmd.py:112 JobMan2cmd: ns registered 4@Mupif.Abaqus@Demo with uri PYRO:obj_815c8007f06c476fa887248511c3f15d@172.30.0.73:9553 
+
+2020-01-08 16:30:22 INFO:JobMan2cmd.py:114 Signature is LIST_Abaqus_API 
+
+2020-01-08 16:30:22 INFO:AbaqusAPI22.py:102 Abaqus intialization 
+
+2020-01-08 16:30:22 INFO:AbaqusAPI22.py:110 [{'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus1', 'Name': 'E_1', 'Description': 'Young modulus 1', 'Units': 'MPa', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus2', 'Name': 'E_2', 'Description': 'Young modulus 2', 'Units': 'MPa', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus3', 'Name': 'E_3', 'Description': 'Young modulus 3', 'Units': 'MPa', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_PoissonRatio12', 'Name': 'nu_12', 'Description': "Poisson's ration 12", 'Units': 'none', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_PoissonRatio13', 'Name': 'nu_13', 'Description': "Poisson's ration 13", 'Units': 'none', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_PoissonRatio23', 'Name': 'nu_23', 'Description': "Poisson's ration 23", 'Units': 'none', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus12', 'Name': 'G_12', 'Description': 'Shear modulus 12', 'Units': 'MPa', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus13', 'Name': 'G_13', 'Description': 'Shear modulus 13', 'Units': 'MPa', 'Required': True}, {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus23', 'Name': 'G_23', 'Description': 'Shear modulus 23', 'Units': 'MPa', 'Required': True}] 
+
+2020-01-08 16:30:22 DEBUG:Model.py:469 Removing application 4@Mupif.Abaqus@Demo from a nameServer <Pyro4.core.Proxy at 0x7fc54c8e7f28; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-08 16:30:22 INFO:Model.py:490 Unregistering daemon <Pyro4.core.Daemon at 0x7fc54c7f4320; 172.30.0.73:9553 - IPv4; 1 objects> 
+
