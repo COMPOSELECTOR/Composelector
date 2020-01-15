@@ -27,6 +27,12 @@ A_10 - Lammps -> Digimat  	                	working
 A_11 - Digimat                                  	working
 
 
+Workflows computing KPI 1 - 1 (weight) and  KPI 1 - 3 (stiffness)
+A_12 - Abaqus                                  	        working
+A_13 - Digimat -> Abaqus                                working
+A_14 - Lammps -> Digimat -> Abaqus                      working
 
-Workflows computing KPI 1 - 1 (weight)
+
+
+
 
