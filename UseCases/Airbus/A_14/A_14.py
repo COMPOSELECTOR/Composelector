@@ -1,20 +1,22 @@
 import sys
 sys.path.extend(['/home/nitram/Documents/work/MUPIF/mupif'])
-from mupif import *
-from mupif import dataID, PropertyID, Property, ValueType
 import mupif
-import Pyro4
-import logging
-log = logging.getLogger()
-import time as timeT
+from mupif import *
+from mupif import PyroUtil, Util, Workflow, APIError
+from mupif import dataID, PropertyID, Property, ValueType
 import mupif.Physics.PhysicalQuantities as PQ
 
+import sys
+import argparse
+import Pyro4
 import os
 import shutil
 import glob
+import logging
+log = logging.getLogger()
+import time as timeT
 
 debug = True
-
 
 if not debug:
     import ComposelectorSimulationTools.MIUtilities as miu
@@ -27,21 +29,26 @@ nshost = '172.30.0.1'
 nsport = 9090
 hkey = 'mupif-secret-key'
 digimatJobManName = 'eX_DigimatMF_JobManager'
-abaqusJobManName = 'Abaqus@Mupif.LIST'
+abaqusJobManName='Abaqus@Mupif.LIST'
 
-class Airbus_Workflow_6(Workflow.Workflow):
-
+class A_14(Workflow.Workflow):
+   
     def __init__(self, metaData={}):
         """
         Initializes the workflow. As the workflow is non-stationary, we allocate individual 
         applications and store them within a class.
         """
+
         log.info('Setting Workflow basic metadata')
         MD = {
+####  Model information #### 
             'Name': 'Airbus Case',
-            'ID': 'A_5',
-            'Description': 'Simulation of ',
-            'Model_refs_ID': ['xy', 'xy'],
+            'ID': '1_2_2',
+            'Description': 'Simulation of volume, stiffness and maximum principal stress',
+            'Model_refs_ID': ['quasistatic Macromodel'],
+############################
+
+####  Workflow input definition ####
             'Inputs': [
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_MatrixYoung', 'Name': 'E_m',
                  'Description': 'Young modulus of the matrix', 'Units': 'MPa', 'Required': True},
@@ -72,6 +79,7 @@ class Airbus_Workflow_6(Workflow.Workflow):
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeTransversePoisson', 'Name': 'nu_transverse',
                  'Description': 'Transverse Poisson\'s ration of the composite', 'Units': 'None'},
             ],
+
             'AbaqusInputs': [
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_YoungModulus1', 'Name': 'E_1',
                  'Description': 'Young modulus 1', 'Units': 'MPa', 'Required': True},
@@ -92,74 +100,89 @@ class Airbus_Workflow_6(Workflow.Workflow):
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus23', 'Name': 'G_23',
                  'Description': 'Shear modulus 23', 'Units': 'MPa', 'Required': True},                
             ],
+############################
+
+#### Workflow output definition #### 
             'AbaqusOutputs': [
-                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CriticalLoadLevel', 'Name': 'F_crit',
-                 'Description': 'Buckling load of the structure', 'Units': 'kN'},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_Volume',  'Name': 'volume',
+                 'Description': 'volume of the structure', 'Units': 'mm**3', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_Stiffness',  'Name': 'stiffness',
+                 'Description': 'rotational stiffness of the structure', 'Units': 'Nmm', 'Required': True},
+############################
             ]
-
         }
-
-        super(Airbus_Workflow_6, self).__init__(metaData=MD)
+        super(A_14, self).__init__(metaData=MD)
         self.updateMetadata(metaData)        
 
+        
         #list of recognized input porperty IDs
         self.myInputPropIDs = [PropertyID.PID_SMILE_MOLECULAR_STRUCTURE,PropertyID.PID_MOLECULAR_WEIGHT, PropertyID.PID_CROSSLINKER_TYPE,PropertyID.PID_FILLER_DESIGNATION, PropertyID.PID_CROSSLINKONG_DENSITY,PropertyID.PID_FILLER_CONCENTRATION, PropertyID.PID_TEMPERATURE, PropertyID.PID_PRESSURE, PropertyID.PID_POLYDISPERSITY_INDEX,PropertyID.PID_SMILE_MODIFIER_MOLECULAR_STRUCTURE,PropertyID.PID_SMILE_FILLER_MOLECULAR_STRUCTURE,PropertyID.PID_DENSITY_OF_FUNCTIONALIZATION, PropertyID.PID_InclusionYoung, PropertyID.PID_InclusionPoisson, PropertyID.PID_InclusionVolumeFraction, PropertyID.PID_InclusionAspectRatio]
+
+        
         # list of compulsory IDs
         self.myCompulsoryPropIDs = self.myInputPropIDs
+
         #list of recognized output property IDs
         self.myOutPropIDs =  [PropertyID.PID_EModulus, PropertyID.PID_PoissonRatio, PropertyID.PID_DENSITY, PropertyID.PID_effective_conductivity, PropertyID.PID_TRANSITION_TEMPERATURE, PropertyID.PID_CriticalLoadLevel, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
 
-
+        
         #dictionary of input properties (values)
         self.myInputProps = {}
         #dictionary of output properties (values)
         self.myOutProps = {}
-
+        
+       
         self.myMacroOutPropIDs = []
         for data in self.getMetadata("AbaqusOutputs"):
             self.myMacroOutPropIDs.append(eval(data['Type_ID']))
         
-        self.myMacroOutProps = {}  
+        self.myMacroOutProps = {}       
+
         
-        # solvers
         self.digimatSolver = None
         self.abaqusSolver = None
-        
 
 
-    def initialize(self, file='', workdir='', targetTime=PQ.PhysicalQuantity(1., 's'), metaData={}, validateMetaData=True, **kwargs):
-        log.info('Workflow initialization')
+
+    def initialize(self, file='', workdir='', targetTime=PQ.PhysicalQuantity(0., 's'), metaData={}, validateMetaData=True, **kwargs):
+
         #locate nameserver
         ns = PyroUtil.connectNameServer(nshost, nsport, hkey)
+
         #connect to digimat JobManager running on (remote) server
         self.digimatJobMan = PyroUtil.connectJobManager(ns, digimatJobManName,hkey)
-        #connect to abaqus JobManager running on (remote) server
-        self.abaqusJobMan = PyroUtil.connectJobManager(ns, abaqusJobManName,hkey)
         
+        #connect to JobManager running on (remote) server
+        self.abaqusJobMan = PyroUtil.connectJobManager(ns, abaqusJobManName,hkey)
 
-        #allocate the Digimat remote instance
+        #allocate the Abaqus remote instance
         try:
             self.lammpsSolver = lammps.LAMMPS_API()
             log.info('Created LAMMPS job')
+
             self.digimatSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.digimatJobMan, None, hkey)
             log.info('Created digimat job')
-            self.abaqusSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.abaqusJobMan, None, hkey)
-            log.info('Created Abaqus job')            
+
+            self.abaqusSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.abaqusJobMan, None, hkey, sshContext=None)       
+            log.info('Created Abaqus job')
         except Exception as e:
             log.exception(e)
         else:
             if ((self.lammpsSolver is not None) and (self.digimatSolver is not None) and (self.abaqusSolver is not None)):
                 lammpsSolverSignature=self.lammpsSolver.getApplicationSignature()
                 log.info("Working lammps solver on server " + lammpsSolverSignature)
+
                 digimatSolverSignature=self.digimatSolver.getApplicationSignature()
                 log.info("Working digimat solver on server " + digimatSolverSignature)
+
                 abaqusSolverSignature=self.abaqusSolver.getApplicationSignature()
-                log.info("Working abaqus solver on server " + abaqusSolverSignature)
+                log.info("Working Abaqus solver on server " + abaqusSolverSignature)
             else:
                 log.debug("Connection to server failed, exiting")
+       
 
-        super(Airbus_Workflow_6, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
-        log.info('Metadata were successfully validate')
+
+        super(A_14, self).initialize(file=file, workdir=workdir, targetTime=targetTime, metaData=metaData, validateMetaData=validateMetaData, **kwargs)
 
         # To be sure update only required passed metadata in models
         passingMD = {
@@ -173,8 +196,6 @@ class Airbus_Workflow_6(Workflow.Workflow):
         log.info('Setting Execution Metadata of LAMMPS')
         self.lammpsSolver.initialize(metaData=passingMD)
 
-
-    
         log.info('Setting Execution Metadata of Digimat')
         # Digimat initialization
         self.digimatSolver.initialize(metaData=passingMD)
@@ -183,13 +204,14 @@ class Airbus_Workflow_6(Workflow.Workflow):
         # Abaqus initialization
         cfile1='abaqus_v6.env'
         cfile2=self.file
+
         ###########################################################################################
         ### START ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
         # select input file location: True = application server, False: control script computer
         filesend = False
 
         # Define server path of input files
-        log.info('**** copy files to working directories')
+        print('**** copy files to working directories')
         if filesend:
             basepath=os.path.abspath('..')
             inpDir2 = os.path.join(basepath,'abaqusserver','inputFiles')
@@ -197,34 +219,32 @@ class Airbus_Workflow_6(Workflow.Workflow):
             inpDir2 = os.path.abspath('./inputFiles')
 
         # identify input files
-        log.info("Identifying input files.")
+        print("Identifying input files.")
         self.file2 = glob.glob(os.path.join(inpDir2, cfile2))[0]
         self.file2 = os.path.basename(self.file2)
 
         try:
             inpFiles2 = []
             if filesend:
-                inpFiles2.extend(glob.glob(os.path.join(inpDir2, 'abaqus_v6.env')))
-#                inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile2)))
-                inpFiles2.extend(glob.glob(os.path.join(inpDir2, file)))
+                inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile1)))
+                inpFiles2.extend(glob.glob(os.path.join(inpDir2, cfile2)))
             else:
-                inpFiles2.append('abaqus_v6.env')
-#                inpFiles2.append(cfile2)
-                inpFiles2.append(file)
+                inpFiles2.append(cfile1)
+                inpFiles2.append(cfile2)
         except Exception as err:
             print("Error:" + repr(err))
         
         # copy Abaqus input files to server work directories
-        log.info("Transferring input files to the work directory.")
+        print("Transferring input files to the work directory.")
         if filesend:
-            log.info("$$$ Uploading input files from application server to workdir")
+            print("$$$ Uploading input files from application server to workdir")
             try:
                 for inpFile in inpFiles2:
                     shutil.copy(inpFile, self.abaqusJobMan.getJobWorkDir(self.abaqusSolver.getJobID()))
             except Exception as err:
-                log.info("Error:" + repr(err))
+                print("Error:" + repr(err))
         else:
-            log.info("$$$ Uploading input files from control computer to workdir")
+            print("$$$ Uploading input files from control computer to workdir")
             log.info("Uploading input files to server")
             try:
                 for inpFile in inpFiles2:
@@ -235,7 +255,7 @@ class Airbus_Workflow_6(Workflow.Workflow):
 
         ### END ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
         #########################################################################################
-        log.info('FILES COPIED')
+        print('FILES COPIED')
 
         # define metadata to be passed to ABAQUS solver
         app2MD=passingMD.copy()
@@ -244,41 +264,35 @@ class Airbus_Workflow_6(Workflow.Workflow):
         app2MD['refPoint'] = 'M_SET-1'
         app2MD['componentID'] = 6
         ############################
-
+        
         # initialize abaqus solver
-        self.abaqusSolver.initialize(metaData=app2MD, file = self.file,
-                                        workdir = self.abaqusJobMan.getJobWorkDir(self.abaqusSolver.getJobID()), 
-                                        validateMetadata = True)
-        log.info('SOLVER INITIALIZED')
+        self.abaqusSolver.initialize(metaData=app2MD, file = self.file2, workdir = self.abaqusJobMan.getJobWorkDir(self.abaqusSolver.getJobID()))
+        print('SOLVER INITIALIZED')
         ############################
 
 
-                
+        
+        
 
     def setProperty(self, property, objectID=0):
         propID = property.getPropertyID()
         if (propID in self.myInputPropIDs):
             self.myInputProps[propID]=property
-        elif (propID in self.abaqusInputPropIDs):
-            self.abaqusInputProps[propID]=property
         else:
-            print('property id is', propID)
             raise APIError.APIError('Unknown property ID')
 
     def getProperty(self, propID, time, objectID=0):
         if (propID in self.myOutPropIDs):
             return self.myOutProps[propID]
         else:
-            print('property id is', propID)
             raise APIError.APIError ('Unknown property ID', propID)   
 
     def solveStep(self, istep, stageID=0, runInBackground=False):
 
+        # check if compulsory input properties exist
         for cID in self.myCompulsoryPropIDs:
             if cID not in self.myInputProps:
                 raise APIError.APIError (self.getApplicationSignature(), ' Missing compulsory property ', cID)   
-
-
         try:
             # lammps 
             self.lammpsSolver.setProperty(self.myInputProps[PropertyID.PID_SMILE_MOLECULAR_STRUCTURE])
@@ -386,12 +400,12 @@ class Airbus_Workflow_6(Workflow.Workflow):
         except Exception as err:
             print ("Setting Abaqus params failed: " + repr(err));
             self.terminate()
-            
+
         try:
-            # solve digimat part
+            # solve Abaqus part
             log.info("Running Abaqus")
             self.abaqusSolver.solveStep(None)
-            ## get the desired properties
+
             ## get KPIs from Abaqus
             # KPIs have to be extracted here because default self.solve terminates application instance
             print('*** Get KPIs:',self.myMacroOutPropIDs)
@@ -403,7 +417,7 @@ class Airbus_Workflow_6(Workflow.Workflow):
                 except Exception as e:
                     log.error("ABAQUS KPI retrieval failed", propID)
                     print(str(e))
-                    
+               
             print('*** KPIs:',self.myMacroOutProps)
             print('WORKFLOW: GOT ALL KPIs')
 
@@ -418,10 +432,8 @@ class Airbus_Workflow_6(Workflow.Workflow):
         return PQ.PhysicalQuantity(1.0, 's')
 
     def terminate(self):
-        #self.thermalAppRec.terminateAll()
-        self.digimatSolver.terminate()
         self.abaqusSolver.terminate()
-        super(Airbus_Workflow_6, self).terminate()
+        super(A_14, self).terminate()
 
     def getApplicationSignature(self):
         return "Composelector workflow 1.0"
@@ -429,34 +441,47 @@ class Airbus_Workflow_6(Workflow.Workflow):
     def getAPIVersion(self):
         return "1.0"
 
-
 def workflow(inputGUID, execGUID):
+    """
+    Workflow for Airbus use case.
+    Calculation of KPI buckling load from data base material properties
+    """
     # Define execution details to export
     if not debug:
-        execPropsToExp = {"ID": "", "Use case ID": ""}
+        execPropsToExp = {"ID": "",
+                          "Use case ID": ""}
+        
         # Export execution information from database
-        ExportedExecInfo = miu.ExportData("MI_Composelector", "Modelling tasks workflows executions", execGUID, execPropsToExp)
+        ExportedExecInfo = miu.ExportData("MI_Composelector", "Modelling tasks workflows executions", execGUID,
+                                          execPropsToExp)
         execID = ExportedExecInfo["ID"]
         useCaseID = ExportedExecInfo["Use case ID"]
+        
         # Define properties:units to export
-        propsToExp = {"Matrix Young's modulus": "MPa",
-                      "Matrix Poisson's ratio": "",
-                      "Inclusion Young's modulus": "MPa",
-                      "Inclusion Poisson's ratio": "",
-                      "Inclusion volume fraction": "%",
-                      "Inclusion aspect ratio": ""
+        propsToExp = {"Axial Young's modulus": "MPa",
+                      "In-plane Young's modulus": "MPa",
+                      "E3": "MPa",
+                      "In-plane shear modulus": "MPa",
+                      "Transverse shear modulus": "MPa",
+                      "G23": "MPa",
+                      "In-plane Poisson's ratio": "",
+                      "Transverse Poisson's ratio": "",
+                      "NU23": ""
         }
         
         # Export data from database
         ExportedData = miu.ExportData("MI_Composelector", "Inputs-Outputs", inputGUID, propsToExp, miu.unitSystems.METRIC)
         
-        matrixYoung = ExportedData["Matrix Young's modulus"]
-        matrixPoisson = ExportedData["Matrix Poisson's ratio"]
-        inclusionYoung = ExportedData["Inclusion Young's modulus"]
-        inclusionPoisson = ExportedData["Inclusion Poisson's ratio"]
-        inclusionVolumeFraction = ExportedData["Inclusion volume fraction"]
-        inclusionAspectRatio = ExportedData["Inclusion aspect ratio"]
-        
+        # Assign exported properties to variables
+        E1 = ExportedData["Axial Young's modulus"]
+        E2 = ExportedData["In-plane Young's modulus"]
+        E3 = ExportedData["E3"]
+        G12 = ExportedData["In-plane shear modulus"]
+        G13 = ExportedData["Transverse shear modulus"]
+        G23 = ExportedData["G23"]
+        nu12 = ExportedData["In-plane Poisson's ratio"]
+        nu13 = ExportedData["Transverse Poisson's ratio"]
+        nu23 = ExportedData["NU23"]
     else:
         monomerMolStructure = 1
         polymerMolWeight = 0.5
@@ -482,29 +507,26 @@ def workflow(inputGUID, execGUID):
         inclusionVolumeFraction = 0.5
         inclusionAspectRatio = 1
 
-        ####    define ABAQUS input file names ####
-        #cfile2='composelector_Panel-quasi-v4.inp'
-        cfile2='composelector_Panel-v4d.inp'
         
+####    define ABAQUS input file names ####
+        cfile2='composelector_Panel-quasi-v3.inp'
+
         try:
-            workflow = Airbus_Workflow_6()
-            workflowMD = {
+            workflow = A_14()
+            workflowID = {
                 'Execution': {
                     'ID': '1',
                     'Use_case_ID': '1_1',
                     'Task_ID': '1'
                 }
             }
-
-
-
-
-
-            
-            workflow.initialize(file = cfile2, targetTime=PQ.PhysicalQuantity(1., 's'), metaData=workflowMD)
-
-
-            # create and set lammps material properties
+            workflowMD = workflowID.copy()
+            workflow.initialize(file = cfile2,targetTime=PQ.PhysicalQuantity(1., 's'), metaData=workflowMD)
+            print('WORKFLOW INITIALIZED')
+            # set workflow input data
+            # Submitting new material properties
+            # set workflow input data
+                        # create and set lammps material properties
             workflow.setProperty(Property.ConstantProperty(monomerMolStructure, PropertyID.PID_SMILE_MOLECULAR_STRUCTURE, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
             workflow.setProperty(Property.ConstantProperty(polymerMolWeight, PropertyID.PID_MOLECULAR_WEIGHT, ValueType.Scalar, 'mol', None, 0))
             workflow.setProperty(Property.ConstantProperty(crosslinkerType, PropertyID.PID_CROSSLINKER_TYPE, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
@@ -521,11 +543,11 @@ def workflow(inputGUID, execGUID):
             workflow.setProperty(Property.ConstantProperty(inclusionPoisson, PropertyID.PID_InclusionPoisson, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
             workflow.setProperty(Property.ConstantProperty(inclusionVolumeFraction, PropertyID.PID_InclusionVolumeFraction, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
             workflow.setProperty(Property.ConstantProperty(inclusionAspectRatio, PropertyID.PID_InclusionAspectRatio, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
-            
+
             # solve workflow
             workflow.solve()
             log.info('WORKFLOW SOLVED')
-            
+
             # get workflow outputs
             time = PQ.PhysicalQuantity(1.0, 's')
             # get LAMMPS outputs
@@ -542,28 +564,25 @@ def workflow(inputGUID, execGUID):
             compositeTransverseShear = workflow.getProperty(PropertyID.PID_CompositeTransverseShear,time).inUnitsOf('MPa').getValue()
             compositeInPlanePoisson = workflow.getProperty(PropertyID.PID_CompositeInPlanePoisson,time).getValue()
             compositeTransversePoisson = workflow.getProperty(PropertyID.PID_CompositeTransversePoisson,time).getValue()
-            
-            BucklingLoad = workflow.myMacroOutProps[PropertyID.PID_CriticalLoadLevel]
-            log.info("Requested KPI : Buckling Load: " + str(BucklingLoad) + ' N')
+
+
+
+            volume = workflow.myMacroOutProps[mupif.PropertyID.PID_Volume]
+            stiffness = workflow.myMacroOutProps[mupif.PropertyID.PID_Stiffness]
+            log.info("Requested KPI : Volume: " + str(volume))
+            log.info("Requested KPI : Stiffness: " + str(stiffness))
             workflow.terminate()
             log.info("Process complete")
-
             
             if not debug:
                 # Importing output to database
                 ImportHelper = miu.Importer("MI_Composelector", "Inputs-Outputs", ["Inputs/Outputs"])
                 ImportHelper.CreateAttribute("Execution ID", execID, "")
-                ImportHelper.CreateAttribute("Axial Young's modulus", compositeAxialYoung, "MPa")
-                ImportHelper.CreateAttribute("In-plane Young's modulus", compositeInPlaneYoung, "MPa")
-                ImportHelper.CreateAttribute("In-plane shear modulus", compositeInPlaneShear, "MPa")
-                ImportHelper.CreateAttribute("Transverse shear modulus", compositeTransverseShear, "MPa")
-                ImportHelper.CreateAttribute("In-plane Poisson's ratio", compositeInPlanePoisson, "")
-                ImportHelper.CreateAttribute("Transverse Poisson's ratio", compositeTransversePoisson, "")
-                ImportHelper.CreateAttribute("Buckling Load", bucklingLoad, "N")
+                ImportHelper.CreateAttribute("Buckling Load", buckLoad, "N")
                 return ImportHelper
             
         except APIError.APIError as err:
-            print ("Mupif API for Airubu_Workflow_6: " + repr(err))
+            print ("Mupif API for Scenario error: " + repr(err))
         except Exception as err:
             print ("Error: " + repr(err))
         except:

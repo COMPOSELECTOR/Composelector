@@ -163,11 +163,10 @@ class Airbus_Workflow_5(Workflow.Workflow):
         }
 
         log.info('Setting Execution Metadata of Digimat')
-        log.info('Setting Execution Metadata of Abaqus')
-
         # Digimat initialization
         self.digimatSolver.initialize(metaData=passingMD)
 
+        log.info('Setting Execution Metadata of Abaqus')
         # Abaqus initialization
         cfile1='abaqus_v6.env'
         cfile2=self.file

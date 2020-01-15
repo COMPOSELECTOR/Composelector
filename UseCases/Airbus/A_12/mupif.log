@@ -1,0 +1,46 @@
+2020-01-14 16:48:26 INFO:A_12.py:39 Setting Workflow basic metadata 
+
+2020-01-14 16:48:26 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-01-14 16:48:26 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.77 
+
+2020-01-14 16:48:26 INFO:PyroUtil.py:556 Located Job Manager Abaqus@Mupif.LIST at: 172.30.0.163 44385 None None 
+
+2020-01-14 16:48:26 DEBUG:PyroUtil.py:252 Application Abaqus@Mupif.LIST, found URI PYRO:obj_4766d4ed19d847299a107435dd297b0b@172.30.0.163:44385 on ('172.30.0.163', 44385, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f51a70ade10; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 16:48:26 INFO:PyroUtil.py:260 Connecting to application Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7f51a70c1358; not connected; for PYRO:obj_4766d4ed19d847299a107435dd297b0b@172.30.0.163:44385> 
+
+2020-01-14 16:48:26 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application Abaqus@Mupif.LIST 
+
+2020-01-14 16:48:26 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-01-14 16:48:27 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '37@Abaqus@Mupif.LIST', 9286) 
+
+2020-01-14 16:48:27 INFO:PyroUtil.py:638 Scenario: Connecting to 37@Abaqus@Mupif.LIST 9286 
+
+2020-01-14 16:48:28 DEBUG:PyroUtil.py:252 Application 37@Abaqus@Mupif.LIST, found URI PYRO:obj_099dff0c50a344eab203cbe9829070ea@172.30.0.163:9286 on ('172.30.0.163', 9286, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f51a70ade10; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-01-14 16:48:28 INFO:PyroUtil.py:260 Connecting to application 37@Abaqus@Mupif.LIST with <Pyro4.core.Proxy at 0x7f51a70d9240; not connected; for PYRO:obj_099dff0c50a344eab203cbe9829070ea@172.30.0.163:9286> 
+
+2020-01-14 16:48:28 DEBUG:PyroUtil.py:262 Connected to LIST_Abaqus_API with the application 37@Abaqus@Mupif.LIST 
+
+2020-01-14 16:48:28 INFO:A_12.py:126 Created Abaqus job 
+
+2020-01-14 16:48:28 INFO:A_12.py:132 Working Abaqus solver on server LIST_Abaqus_API 
+
+2020-01-14 16:48:28 INFO:A_12.py:149 Setting Execution Metadata of Abaqus 
+
+2020-01-14 16:48:28 INFO:A_12.py:194 Uploading input files to server 
+
+2020-01-14 16:49:14 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-01-14 16:49:15 INFO:A_12.py:260 Running Abaqus 
+
+2020-01-14 16:50:19 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 37@Abaqus@Mupif.LIST on Abaqus@Mupif.LIST 
+
+2020-01-14 16:50:20 INFO:Model.py:496 Terminating model 
+
+2020-01-14 16:50:20 INFO:Model.py:496 Terminating model 
+
+2020-01-14 16:50:20 INFO:A_12.py:387 Process complete 
+
