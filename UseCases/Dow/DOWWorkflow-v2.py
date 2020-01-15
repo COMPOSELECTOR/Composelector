@@ -25,6 +25,7 @@ cmbsfeJobManName='CmbsFE@Mupif.LIST'
 abaqusJobManName='Abaqus@Mupif.LIST'
 
 
+
 sys.path.append('../abaqusServer')
 sys.path.append('../cmbsfeServer')
 sys.path.append('../WFGeneric')
@@ -36,9 +37,6 @@ log = logging.getLogger()
 
 start = timeT.time()
 log.info('Timer started')
-
-#Read int for mode as number behind '-m' argument: 0-local (default), 1-ssh, 2-VPN 
-mode = argparse.ArgumentParser(parents=[Util.getParentParser()]).parse_args().mode
 
 
 class DowWorkflow(Workflow.Workflow):
@@ -126,43 +124,43 @@ class DowWorkflow(Workflow.Workflow):
         # dictionary of Macro-scale output properties (values)
         self.myMacroOutProps = {}
         
-        sshContext = None
         # Locate nameserver
         ns = PyroUtil.connectNameServer(nshost=nshost, nsport=nsport, hkey=hkey)
         log.info('Solver: Nameserver connected')
         # Connect to JobManagers running on (remote) servers
         log.info('Connecting to JobManagers running on servers')
-        print('**** Abaqus jobmanager', sshContext)
-        self.abaqusJobMan = PyroUtil.connectJobManager(ns,abaqusJobManName, hkey,None)
+        print('**** Abaqus jobmanager')
+        self.JobMan2 = PyroUtil.connectJobManager(ns,abaqusJobManName, hkey,None)
         log.info('**** Abaqus jobmanager found')
-        self.abaqusApp = None
+        self.app2 = None
+
         print('**** CMBSFE jobmanager')
-        self.feJobMan = PyroUtil.connectJobManager(ns,cmbsfeJobManName, hkey,sshContext)
-        self.feApp = None
+        self.JobMan1 = PyroUtil.connectJobManager(ns,cmbsfeJobManName, hkey,None)
+        self.app1 = None
         log.info('**** CMBSFE jobmanager found')
 
         try:
             print('**** Creating job 1 : CMBSFE')
-            self.feApp = PyroUtil.allocateApplicationWithJobManager(ns, self.feJobMan, None, hkey)
+            self.app1 = PyroUtil.allocateApplicationWithJobManager(ns, self.JobMan1, None, hkey, None)
             log.info('Created job 1 : CMBSFE')
 
             print('**** Creating job 2 : ABAQUS')
-            self.abaqusApp = PyroUtil.allocateApplicationWithJobManager(ns, self.abaqusJobMan, None, hkey)
+            self.app2 = PyroUtil.allocateApplicationWithJobManager(ns, self.JobMan2, None, hkey, None)
             log.info('Created job 2 : ABAQUS')
 
         except Exception as e:
             log.exception(e)
         else:
-            if (self.feApp != None):
-                SolverSignature=self.feApp.getApplicationSignature()
+            if (self.app1 != None):
+                SolverSignature=self.app1.getApplicationSignature()
                 log.info("*** Working CMBSFE solver on server " + SolverSignature)
-            if (self.abaqusApp != None):
-                SolverSignature=self.abaqusApp.getApplicationSignature()
+            if (self.app2 != None):
+                SolverSignature=self.app2.getApplicationSignature()
                 log.info("*** Working ABAQUS solver on server " + SolverSignature)
             else:
                 log.debug("Connection to server failed, exiting")
                            
-           
+            
     def setProperty(self, property, objectID=0):
         propID = property.getPropertyID()
         if (propID in self.myCompulsoryPropIDs):
@@ -194,7 +192,7 @@ class DowWorkflow(Workflow.Workflow):
                                          ' Missing compulsory property ', cID)   
         try:
             for propid in self.myInputPropIDs:
-                self.feApp.setProperty(self.myInputProps[propid], 
+                self.app1.setProperty(self.myInputProps[propid], 
                                         objectID=self.myInputPropDomIDs[propid])
         except Exception as err:
             print("Setting LIST CmbsFE params failed: " + repr(err));
@@ -206,7 +204,7 @@ class DowWorkflow(Workflow.Workflow):
             try :
                 istep = TimeStep.TimeStep(1., 1., 1.,'s',1)
                 print('CMBSFE solve',istep)
-                self.feApp.solveStep(istep, stageID=1, runInBackground=False)
+                self.app1.solveStep(istep, stageID=1, runInBackground=False)
                 print('CMBSFE solved')
             except Exception as e:
                 print("\n An exception was thrown! \n")
@@ -215,9 +213,9 @@ class DowWorkflow(Workflow.Workflow):
 
             ## get properties from CmbsFE and set the properties for Abaqus
             for propID in self.myMicroOutPropIDs:
-                prop = self.feApp.getProperty(propID)
+                prop = self.app1.getProperty(propID)
                 self.myMicroOutProps[propID] = prop
-                self.abaqusApp.setProperty(prop)
+                self.app2.setProperty(prop)
                 
             # solve using LIST Abaqus solver
             log.info("Running LIST Abaqus solver")
@@ -225,7 +223,7 @@ class DowWorkflow(Workflow.Workflow):
             try :
                 istep = TimeStep.TimeStep(1., 1., 1.,'s',1)
                 print('ABAQUS solve',istep)
-                self.abaqusApp.solveStep(istep, stageID=1, runInBackground=False)
+                self.app2.solveStep(istep, stageID=1, runInBackground=False)
                 print('ABAQUS solved')
             except Exception as e:
                 print("\n An exception was thrown! \n")
@@ -237,7 +235,7 @@ class DowWorkflow(Workflow.Workflow):
             ## get KPIs from Abaqus
             print('*** Get KPIs:',self.myMacroOutPropIDs)
             for propID in self.myMacroOutPropIDs:
-                prop = self.abaqusApp.getProperty(propID)
+                prop = self.app2.getProperty(propID)
                 self.myMacroOutProps[propID] = prop
                 
         except Exception as err:
@@ -245,14 +243,13 @@ class DowWorkflow(Workflow.Workflow):
             self.terminate()
             
     def terminate(self):
-        self.feApp.terminate()
-        self.abaqusApp.terminate()
-
+        self.app1.terminate()
+        self.app2.terminate()
         super(DowWorkflow, self).terminate()
 
     def getCriticalTimeStep(self):
-        return min(self.feApp.getCriticalTimeStep(), 
-                   self.abaqusApp.getCriticalTimeStep())
+        return min(self.app1.getCriticalTimeStep(), 
+                   self.app2.getCriticalTimeStep())
         
     def getApplicationSignature(self):
         return "Dow Workflow for simple multiscale model"
@@ -337,15 +334,13 @@ def workflow_execution(inputGUID, execGUID):
         workflowMD['Outputs'] = [
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_Stiffness',  'Name': 'Footprint', 'Units': 'mm**2', 'Required': True},
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_maxDisplacement',  'Name': 'max. displacement', 'Units': 'mm', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_maxMisesStress',  'Name': 'max. von Mises Stress', 'Units': 'MPa', 'Required': True},
-                {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_maxPrincipalStress',  'Name': 'max. principal Stress', 'Units': 'MPa', 'Required': True},
                        ]
 #        (maxMisesStress, maxDeflection, maxPrincipalStress, stiffness) = KPIs
 
-        feAppMD=workflowID.copy()
-        abaqusAppMD=workflowID.copy()
+        app1MD=workflowID.copy()
+        app2MD=workflowID.copy()
 
-        feAppMD['Outputs'] = [
+        app1MD['Outputs'] = [
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_YoungModulus1',  'Name': 'compositeYoungModulus1', 'Units': 'MPa', 'Required': True},
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_YoungModulus2',  'Name': 'compositeYoungModulus2', 'Units': 'MPa', 'Required': True},
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_YoungModulus3',  'Name': 'compositeYoungModulus3', 'Units': 'MPa', 'Required': True},
@@ -358,21 +353,21 @@ def workflow_execution(inputGUID, execGUID):
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_PoissonRatio13',  'Name': 'compositePoissonRatio13', 'Units': 'none', 'Required': True},
                 {'Type': 'mupif.Property', 'Type_ID': 'PropertyID.PID_PoissonRatio23',  'Name': 'compositePoissonRatio23', 'Units': 'none', 'Required': True},
                        ]
-        abaqusAppMD['refPoint'] = 'RP'
-        abaqusAppMD['componentID'] = 2
+        app2MD['refPoint'] = 'RP'
+        app2MD['componentID'] = 2
  
         workflow.initialize(metaData=workflowMD )
         print('**** usecase metadata')
         workflow.printMetadata()
         print()
 
-        feAppMD['Inputs']=workflow.getMetadata('Inputs').copy()
-        abaqusAppMD['Outputs']=workflow.getMetadata('Outputs').copy()
+        app1MD['Inputs']=workflow.getMetadata('Inputs').copy()
+        app2MD['Outputs']=workflow.getMetadata('Outputs').copy()
 
         ###########################################################################################
         ### START ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
         # select input file location: True = application server, False: control script computer
-        filesend = True
+        filesend = False
 
         # Define server path of input files
         print('**** copy files to working directories')
@@ -413,9 +408,9 @@ def workflow_execution(inputGUID, execGUID):
             print("$$$ Uploading input files from application server to workdir")
             try:
                 for inpFile in inpFiles1:
-                    shutil.copy(inpFile, workflow.JobMan1.getJobWorkDir(workflow.feApp.getJobID()))
+                    shutil.copy(inpFile, workflow.JobMan1.getJobWorkDir(workflow.app1.getJobID()))
                 for inpFile in inpFiles2:
-                    shutil.copy(inpFile, workflow.JobMan2.getJobWorkDir(workflow.abaqusApp.getJobID()))
+                    shutil.copy(inpFile, workflow.JobMan2.getJobWorkDir(workflow.app2.getJobID()))
             except Exception as err:
                 print("Error:" + repr(err))
         else:
@@ -423,23 +418,23 @@ def workflow_execution(inputGUID, execGUID):
             log.info("Uploading input files to server")
             try:
                 for inpFile in inpFiles1:
-                    pf = workflow.JobMan1.getPyroFile(workflow.feApp.getJobID(), inpFile, 'wb')
-                    PyroUtil.uploadPyroFile(os.path.join(inpDir1,inpFile), pf, cfg.hkey)
+                    pf = workflow.JobMan1.getPyroFile(workflow.app1.getJobID(), inpFile, 'wb')
+                    PyroUtil.uploadPyroFile(os.path.join(inpDir1,inpFile), pf, hkey)
                 for inpFile in inpFiles2:
-                    pf = workflow.JobMan2.getPyroFile(workflow.abaqusApp.getJobID(), inpFile, 'wb')
-                    PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, cfg.hkey)
+                    pf = workflow.JobMan2.getPyroFile(workflow.app2.getJobID(), inpFile, 'wb')
+                    PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, hkey)
             except Exception as err:
                 print("Error:" + repr(err))
 
         ### END ::: TRANSFER ABAQUS INPUT FILES AND IDENTIFY MODEL INPUT FILE: TO BE REPLACED ???
         #########################################################################################
       
-        workflow.feApp.initialize(metaData=feAppMD, file=workflow.file1, workdir=workflow.JobMan1.getJobWorkDir(workflow.feApp.getJobID()))
-        workflow.feApp.printMetadata()
+        workflow.app1.initialize(metaData=app1MD, file=workflow.file1, workdir=workflow.JobMan1.getJobWorkDir(workflow.app1.getJobID()))
+        workflow.app1.printMetadata()
         print()
-        abaqusAppMD['Inputs']=workflow.abaqusApp.getMetadata('Outputs')
-        workflow.abaqusApp.initialize(metaData=abaqusAppMD, file=workflow.file2, workdir=workflow.JobMan2.getJobWorkDir(workflow.abaqusApp.getJobID()))
-        workflow.abaqusApp.printMetadata()
+        app2MD['Inputs']=workflow.app1.getMetadata('Outputs')
+        workflow.app2.initialize(metaData=app2MD, file=workflow.file2, workdir=workflow.JobMan2.getJobWorkDir(workflow.app2.getJobID()))
+        workflow.app2.printMetadata()
         print()
 
         # Set-up input properties to workflow
