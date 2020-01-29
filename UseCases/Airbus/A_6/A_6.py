@@ -8,6 +8,7 @@ import logging
 log = logging.getLogger()
 import time as timeT
 import mupif.Physics.PhysicalQuantities as PQ
+import timeit
 
 import os
 import shutil
@@ -228,8 +229,11 @@ class Airbus_Workflow_6(Workflow.Workflow):
             log.info("Uploading input files to server")
             try:
                 for inpFile in inpFiles2:
+                    starttime = timeit.timeit()
                     pf = self.abaqusJobMan.getPyroFile(self.abaqusSolver.getJobID(), inpFile, 'wb')
                     PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, hkey)
+                    endtime = timeit.timeit()
+                    log.info("Transfer of " + inpFile + " took " + str(endtime-starttime) + "[sec]")
             except Exception as err:
                 print("Error:" + repr(err))
 
