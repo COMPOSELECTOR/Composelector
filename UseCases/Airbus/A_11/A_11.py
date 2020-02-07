@@ -226,10 +226,13 @@ def workflow(inputGUID, execGUID):
 
     except APIError.APIError as err:
         print ("Mupif API for DIGIMAT-MF error: "+ repr(err))
+        workflow.terminate()
     except Exception as err:
         print ("Error: " + repr(err))
+        workflow.terminate()
     except:
         print ("Unknown error.")
+        workflow.terminate()
 
 
 

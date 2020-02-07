@@ -366,10 +366,13 @@ def workflow(inputGUID, execGUID):
 
         except APIError.APIError as err:
             print ("Mupif API for Workflow_1_2_3 error: " + repr(err))
+            workflow.terminate()
         except Exception as err:
             print ("Error: " + repr(err))
+            workflow.terminate()
         except:
             print ("Unknown error.")
+            workflow.terminate()
 
 if __name__=='__main__':
     workflow(0,0)

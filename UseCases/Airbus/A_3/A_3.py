@@ -446,10 +446,13 @@ def workflow(inputGUID, execGUID):
         
     except APIError.APIError as err:
         print ("Mupif API for Airbus_Workflow_3 error: " + repr(err))
+        workflow.terminate()
     except Exception as err:
         print ("Error: " + repr(err))
+        workflow.terminate()
     except:
         print ("Unknown error.")
+        workflow.terminate()
         
         
 

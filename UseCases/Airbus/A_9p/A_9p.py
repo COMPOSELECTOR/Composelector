@@ -137,14 +137,16 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             }
         }
 
-        log.info('Setting Execution Metadata of Digimat')
-        log.info('Setting Execution Metadata of Vps')
 
+
+        log.info('Setting Execution Metadata of Digimat')
         # initialize digimat solver        
         self.digimatSolver.initialize(metaData=passingMD)
-        # initialize comsol solver        
+        # initialize comsol solver
+        log.info('Setting Execution Metadata of comsol')
         self.comsolSolver.initialize(metaData=passingMD)
         # initialize vps solver
+        log.info('Setting Execution Metadata of Vps')
         self.vpsSolver.initialize(metaData=passingMD)
 
                 
@@ -212,10 +214,13 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             # get domain number to filter tooling
             self.domainNumber = self.comsolSolver.getField(FieldID.FID_DomainNumber,0,0)
             ## get fibre orientation for four different layers, already on filtered domain (no toling)
-            self.fibreOrientation0 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1), self.domainNumber, 1.0)
-            self.fibreOrientation90 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,2), self.domainNumber, 1.0)
-            self.fibreOrientation45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,3), self.domainNumber, 1.0)
-            self.fibreOrientation_45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,4), self.domainNumber, 1.0)
+            #self.fibreOrientation0 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1), self.domainNumber, 1.0)
+            #self.fibreOrientation90 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,2), self.domainNumber, 1.0)
+            #self.fibreOrientation45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,3), self.domainNumber, 1.0)
+            # - 45
+            #self.fibreOrientation_45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,4), self.domainNumber, 1.0)
+            fibreOrientation0 = self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1)
+            print(fibreOrientation0)
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()    
@@ -243,24 +248,24 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             compositeTransversePoisson2 =  compositeTransversePoisson
             compositeTransversePoisson2.propID = PropertyID.PID_PoissonRatio23
             
-            self.vpsSolver.setProperty(compositeAxialYoung)
-            self.vpsSolver.setProperty(compositeInPlaneYoung1)
-            self.vpsSolver.setProperty(compositeInPlaneYoung2)
+            #self.vpsSolver.setProperty(compositeAxialYoung)
+            #self.vpsSolver.setProperty(compositeInPlaneYoung1)
+            #self.vpsSolver.setProperty(compositeInPlaneYoung2)
             
-            self.vpsSolver.setProperty(compositeInPlaneShear)          
-            self.vpsSolver.setProperty(compositeTransverseShear1)
-            self.vpsSolver.setProperty(compositeTransverseShear2)
+            #self.vpsSolver.setProperty(compositeInPlaneShear)          
+            #self.vpsSolver.setProperty(compositeTransverseShear1)
+            #self.vpsSolver.setProperty(compositeTransverseShear2)
             
-            self.vpsSolver.setProperty(compositeInPlanePoisson)          
-            self.vpsSolver.setProperty(compositeTransversePoisson1)
-            self.vpsSolver.setProperty(compositeTransversePoisson2)
+            #self.vpsSolver.setProperty(compositeInPlanePoisson)          
+            #self.vpsSolver.setProperty(compositeTransversePoisson1)
+            #self.vpsSolver.setProperty(compositeTransversePoisson2)
             
 
             # set the field orientation, the objectID corresponds to layer angle, i.e, 0,90,45,-45
-            self.vpsSolver.setField(self.fibreOrientation0,FieldID.FID_FibreOrientation,0,0)
-            self.vpsSolver.setField(self.fibreOrientation90,FieldID.FID_FibreOrientation,0,90)
-            self.vpsSolver.setField(self.fibreOrientation45,FieldID.FID_FibreOrientation,0,45)
-            self.vpsSolver.setField(self.fibreOrientation_45,FieldID.FID_FibreOrientation,0,-45)
+            #self.vpsSolver.setField(self.fibreOrientation0,FieldID.FID_FibreOrientation,0,0)
+            #self.vpsSolver.setField(self.fibreOrientation90,FieldID.FID_FibreOrientation,0,90)
+            #self.vpsSolver.setField(self.fibreOrientation45,FieldID.FID_FibreOrientation,0,45)
+            #self.vpsSolver.setField(self.fibreOrientation_45,FieldID.FID_FibreOrientation,0,-45)
 
             
         except Exception as err:
@@ -270,9 +275,10 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         try:
             # solve digimat part
             log.info("Running Vps")
-            self.vpsSolver.solveStep(None)
+            #self.vpsSolver.solveStep(None)
             ## get the desired properties
-            self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.vpsSolver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            #self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.vpsSolver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            log.info("Done")
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -400,20 +406,20 @@ def workflow(inputGUID, execGUID):
             time = PQ.PhysicalQuantity(1.0, 's')
             
             # collect Digimat outputs
-            compositeAxialYoung = workflow.getProperty(PropertyID.PID_CompositeAxialYoung,time).inUnitsOf('MPa').getValue()
-            compositeInPlaneYoung = workflow.getProperty(PropertyID.PID_CompositeInPlaneYoung,time).inUnitsOf('MPa').getValue()
-            compositeInPlaneShear = workflow.getProperty(PropertyID.PID_CompositeInPlaneShear,time).inUnitsOf('MPa').getValue()
-            compositeTransverseShear = workflow.getProperty(PropertyID.PID_CompositeTransverseShear,time).inUnitsOf('MPa').getValue()
-            compositeInPlanePoisson = workflow.getProperty(PropertyID.PID_CompositeInPlanePoisson,time).getValue()
-            compositeTransversePoisson = workflow.getProperty(PropertyID.PID_CompositeTransversePoisson,time).getValue()
+            #compositeAxialYoung = workflow.getProperty(PropertyID.PID_CompositeAxialYoung,time).inUnitsOf('MPa').getValue()
+            #compositeInPlaneYoung = workflow.getProperty(PropertyID.PID_CompositeInPlaneYoung,time).inUnitsOf('MPa').getValue()
+            #compositeInPlaneShear = workflow.getProperty(PropertyID.PID_CompositeInPlaneShear,time).inUnitsOf('MPa').getValue()
+            #compositeTransverseShear = workflow.getProperty(PropertyID.PID_CompositeTransverseShear,time).inUnitsOf('MPa').getValue()
+            #compositeInPlanePoisson = workflow.getProperty(PropertyID.PID_CompositeInPlanePoisson,time).getValue()
+            #compositeTransversePoisson = workflow.getProperty(PropertyID.PID_CompositeTransversePoisson,time).getValue()
             
             # collect Vps outputs
             #KPI 1-1 weight
             #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
             #log.info("Requested KPI : Weight: " + str(weight) + ' kg')
             #KPI 1-2 buckling load
-            bucklingLoad = workflow.getProperty(PropertyID.PID_CriticalLoadLevel, time).inUnitsOf('N').getValue()
-            log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')
+            #bucklingLoad = workflow.getProperty(PropertyID.PID_CriticalLoadLevel, time).inUnitsOf('N').getValue()
+            #log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')
             workflow.terminate()
             log.info("Process complete")
             
