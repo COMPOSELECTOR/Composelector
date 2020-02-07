@@ -6,9 +6,9 @@ import mupif
 import Pyro4
 import logging
 log = logging.getLogger()
-import time as timeT
+from timeit import default_timer as timer
 import mupif.Physics.PhysicalQuantities as PQ
-import timeit
+
 
 import os
 import shutil
@@ -229,10 +229,10 @@ class Airbus_Workflow_6(Workflow.Workflow):
             log.info("Uploading input files to server")
             try:
                 for inpFile in inpFiles2:
-                    starttime = timeit.timeit()
+                    starttime = timer()
                     pf = self.abaqusJobMan.getPyroFile(self.abaqusSolver.getJobID(), inpFile, 'wb')
-                    PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, hkey)
-                    endtime = timeit.timeit()
+                    PyroUtil.uploadPyroFile(os.path.join(inpDir2,inpFile), pf, hkey, size=1024*1024)
+                    endtime = timer()
                     log.info("Transfer of " + inpFile + " took " + str(endtime-starttime) + "[sec]")
             except Exception as err:
                 print("Error:" + repr(err))
