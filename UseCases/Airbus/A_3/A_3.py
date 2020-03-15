@@ -74,12 +74,12 @@ class Airbus_Workflow_3(Workflow.Workflow):
         self.updateMetadata(metaData)        
 
         #list of recognized input porperty IDs
-        self.myInputPropIDs = [PropertyID.PID_SMILE_MOLECULAR_STRUCTURE,PropertyID.PID_MOLECULAR_WEIGHT, PropertyID.PID_CROSSLINKER_TYPE,PropertyID.PID_FILLER_DESIGNATION, PropertyID.PID_CROSSLINKONG_DENSITY,PropertyID.PID_FILLER_CONCENTRATION, PropertyID.PID_TEMPERATURE, PropertyID.PID_PRESSURE, PropertyID.PID_POLYDISPERSITY_INDEX,PropertyID.PID_SMILE_MODIFIER_MOLECULAR_STRUCTURE,PropertyID.PID_SMILE_FILLER_MOLECULAR_STRUCTURE,PropertyID.PID_DENSITY_OF_FUNCTIONALIZATION, PropertyID.PID_InclusionYoung, PropertyID.PID_InclusionPoisson, PropertyID.PID_InclusionVolumeFraction, PropertyID.PID_InclusionAspectRatio]
+        self.myInputPropIDs = [PropertyID.PID_SMILE_MOLECULAR_STRUCTURE,PropertyID.PID_MOLECULAR_WEIGHT, PropertyID.PID_CROSSLINKER_TYPE,PropertyID.PID_FILLER_DESIGNATION, PropertyID.PID_CROSSLINKONG_DENSITY,PropertyID.PID_FILLER_CONCENTRATION, PropertyID.PID_TEMPERATURE, PropertyID.PID_PRESSURE, PropertyID.PID_POLYDISPERSITY_INDEX,PropertyID.PID_SMILE_MODIFIER_MOLECULAR_STRUCTURE,PropertyID.PID_SMILE_FILLER_MOLECULAR_STRUCTURE,PropertyID.PID_DENSITY_OF_FUNCTIONALIZATION, PropertyID.PID_InclusionYoung, PropertyID.PID_InclusionPoisson, PropertyID.PID_InclusionVolumeFraction, PropertyID.PID_InclusionAspectRatio, PropertyID.PID_Density]
         # list of compulsory IDs
         self.myCompulsoryPropIDs = self.myInputPropIDs
 
         #list of recognized output property IDs
-        self.myOutPropIDs =  [PropertyID.PID_EModulus, PropertyID.PID_PoissonRatio, PropertyID.PID_DENSITY, PropertyID.PID_effective_conductivity, PropertyID.PID_TRANSITION_TEMPERATURE, PropertyID.PID_CriticalLoadLevel, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
+        self.myOutPropIDs =  [PropertyID.PID_EModulus, PropertyID.PID_PoissonRatio, PropertyID.PID_DENSITY, PropertyID.PID_effective_conductivity, PropertyID.PID_TRANSITION_TEMPERATURE, PropertyID.PID_Mass, PropertyID.PID_CriticalLoadLevel, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
 
         #dictionary of input properties (values)
         self.myInputProps = {}
@@ -264,7 +264,8 @@ class Airbus_Workflow_3(Workflow.Workflow):
             self.mul2Solver.setProperty(compositeInPlanePoisson)          
             self.mul2Solver.setProperty(compositeTransversePoisson1)
             self.mul2Solver.setProperty(compositeTransversePoisson2)
-            
+
+            self.mul2Solver.setProperty(self.myInputProps[PropertyID.PID_Density])
             
         except Exception as err:
             print ("Setting MUL2 params failed: " + repr(err));
@@ -276,6 +277,8 @@ class Airbus_Workflow_3(Workflow.Workflow):
             self.mul2Solver.solveStep(None)
             ## get the desired properties
             self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.mul2Solver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            self.myOutProps[PropertyID.PID_Mass] = self.mul2Solver.getProperty(PropertyID.PID_Mass, 0.0)
+ 
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -365,7 +368,7 @@ def workflow(inputGUID, execGUID):
         inclusionPoisson = 0.2
         inclusionVolumeFraction = 0.5
         inclusionAspectRatio = 1        
-                
+        rho = 1.58e-9
 
     try:
         workflow = Airbus_Workflow_3()
@@ -395,6 +398,9 @@ def workflow(inputGUID, execGUID):
         workflow.setProperty(Property.ConstantProperty(inclusionVolumeFraction, PropertyID.PID_InclusionVolumeFraction, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
         workflow.setProperty(Property.ConstantProperty(inclusionAspectRatio, PropertyID.PID_InclusionAspectRatio, ValueType.Scalar, PQ.getDimensionlessUnit(), None, 0))
 
+        workflow.setProperty(Property.ConstantProperty(rho, PropertyID.PID_Density, ValueType.Scalar, 'ton/mm**3'))               
+ 
+
         
         # solve workflow
         workflow.solve()
@@ -417,8 +423,8 @@ def workflow(inputGUID, execGUID):
         
         # get MUL2 outputs
         #KPI 1-1 weight
-        #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
-        #log.info("Requested KPI : Weight: " + str(weight) + ' kg')
+        weight = workflow.getProperty(PropertyID.PID_Mass, time).inUnitsOf('kg').getValue()
+        log.info("Requested KPI : Weight: " + str(weight) + ' kg')
         #KPI 1-2 buckling load
         bucklingLoad = workflow.getProperty(PropertyID.PID_CriticalLoadLevel, time).inUnitsOf('N').getValue()
         log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')

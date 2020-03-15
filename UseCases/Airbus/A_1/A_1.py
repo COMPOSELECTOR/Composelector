@@ -51,9 +51,14 @@ class Airbus_Workflow_1(Workflow.Workflow):
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus13', 'Name': 'G_13',
                  'Description': 'Shear modulus 13', 'Units': 'MPa', 'Required': True},
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_ShearModulus23', 'Name': 'G_23',
-                 'Description': 'Shear modulus 23', 'Units': 'MPa', 'Required': True},                
+                 'Description': 'Shear modulus 23', 'Units': 'MPa', 'Required': True},
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_Density', 'Name': 'Rho',
+                 'Description': 'Density', 'Units': 'ton/mm**2', 'Required': True},                
+
             ],
             'Outputs': [
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_Mass', 'Name': 'Mass',
+                 'Description': 'Mass of the structure', 'Units': 'kg'},
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CriticalLoadLevel', 'Name': 'F_crit',
                  'Description': 'Buckling load of the structure', 'Units': 'kN'},
             ]
@@ -62,11 +67,11 @@ class Airbus_Workflow_1(Workflow.Workflow):
         self.updateMetadata(metaData)        
 
         #list of recognized input porperty IDs
-        self.myInputPropIDs = [PropertyID.PID_YoungModulus1,PropertyID.PID_YoungModulus2, PropertyID.PID_YoungModulus3, PropertyID.PID_PoissonRatio12, PropertyID.PID_PoissonRatio13,PropertyID.PID_PoissonRatio23, PropertyID.PID_ShearModulus12, PropertyID.PID_ShearModulus13, PropertyID.PID_ShearModulus23]     
+        self.myInputPropIDs = [PropertyID.PID_YoungModulus1,PropertyID.PID_YoungModulus2, PropertyID.PID_YoungModulus3, PropertyID.PID_PoissonRatio12, PropertyID.PID_PoissonRatio13,PropertyID.PID_PoissonRatio23, PropertyID.PID_ShearModulus12, PropertyID.PID_ShearModulus13, PropertyID.PID_ShearModulus23, PropertyID.PID_Density]     
         # list of compulsory IDs
         self.myCompulsoryPropIDs = self.myInputPropIDs
         #list of recognized output property IDs
-        self.myOutPropIDs =  [PropertyID.PID_CriticalLoadLevel]
+        self.myOutPropIDs =  [PropertyID.PID_CriticalLoadLevel, PropertyID.PID_Mass]
 
         #dictionary of input properties (values)
         self.myInputProps = {}
@@ -144,6 +149,7 @@ class Airbus_Workflow_1(Workflow.Workflow):
             self.mul2Solver.setProperty(self.myInputProps[PropertyID.PID_ShearModulus12])
             self.mul2Solver.setProperty(self.myInputProps[PropertyID.PID_ShearModulus13])
             self.mul2Solver.setProperty(self.myInputProps[PropertyID.PID_ShearModulus23])
+            self.mul2Solver.setProperty(self.myInputProps[PropertyID.PID_Density])
         except Exception as err:
             print ("Setting Mul2 params failed: " + repr(err));
             self.terminate()
@@ -154,6 +160,7 @@ class Airbus_Workflow_1(Workflow.Workflow):
             self.mul2Solver.solveStep(None)
             ## set the desired properties
             self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.mul2Solver.getProperty(PropertyID.PID_CriticalLoadLevel, 0.0)
+            self.myOutProps[PropertyID.PID_Mass] = self.mul2Solver.getProperty(PropertyID.PID_Mass, 0.0)
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -214,16 +221,16 @@ def workflow(inputGUID, execGUID):
         nu13 = ExportedData["Transverse Poisson's ratio"]
         nu23 = ExportedData["NU23"]
     else:
-        E1 = 10
-        E2 = 10
-        E3 = 5
-        G12 = 3
-        G13 = 3
-        G23 = 3
-        nu12 = 0.2
-        nu13 = 0.3
-        nu23 = 0.1
-        
+        E1 = 100.e3
+        E2 = 6.e3
+        E3 = 6.e3
+        G12 = 3.e3
+        G13 = 3.e3
+        G23 = 3.e3
+        nu12 = 0.35
+        nu13 = 0.35
+        nu23 = 0.35
+        rho = 1.58e-9
         try:
             workflow = Airbus_Workflow_1()
             workflowMD = {
@@ -245,7 +252,7 @@ def workflow(inputGUID, execGUID):
             pG12 = workflow.setProperty(Property.ConstantProperty(G12, PropertyID.PID_ShearModulus12, ValueType.Scalar, 'MPa'))
             pG13 = workflow.setProperty(Property.ConstantProperty(G13, PropertyID.PID_ShearModulus13, ValueType.Scalar, 'MPa'))
             pG23 = workflow.setProperty(Property.ConstantProperty(G23, PropertyID.PID_ShearModulus23, ValueType.Scalar, 'MPa'))
-            
+            pRho = workflow.setProperty(Property.ConstantProperty(rho, PropertyID.PID_Density, ValueType.Scalar, 'ton/mm**3'))           
             # solve workflow
             workflow.solve()
             
@@ -254,9 +261,9 @@ def workflow(inputGUID, execGUID):
             
             
             # collect MUL2 outputs
-            #KPI weight
-            #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
-            #log.info("Requested KPI : Weight: " + str(weight) + ' kg')
+            #KPI 1-1 weight
+            weight = workflow.getProperty(PropertyID.PID_Mass, time).inUnitsOf('kg').getValue()
+            log.info("Requested KPI : Weight: " + str(weight) + ' kg')
             #KPI 1-2 buckling load
             bucklingLoad = workflow.getProperty(PropertyID.PID_CriticalLoadLevel, time).inUnitsOf('N').getValue()
             log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')

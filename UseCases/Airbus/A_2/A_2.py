@@ -47,6 +47,8 @@ class Airbus_Workflow_2(Workflow.Workflow):
                  'Description': 'Aspect ratio of the inclusion', 'Units': 'None', 'Required': True},
             ],
             'Outputs': [
+                {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_Mass', 'Name': 'Mass',
+                 'Description': 'Mass of the structure', 'Units': 'kg'},
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CriticalLoadLevel', 'Name': 'F_crit',
                  'Description': 'Buckling load of the structure', 'Units': 'kN'},
                 {'Type': 'mupif.Property', 'Type_ID': 'mupif.PropertyID.PID_CompositeAxialYoung', 'Name': 'E_axial',
@@ -68,12 +70,12 @@ class Airbus_Workflow_2(Workflow.Workflow):
         self.updateMetadata(metaData)        
 
         #list of recognized input porperty IDs
-        self.myInputPropIDs = [PropertyID.PID_MatrixYoung, PropertyID.PID_MatrixPoisson, PropertyID.PID_InclusionYoung, PropertyID.PID_InclusionPoisson, PropertyID.PID_InclusionVolumeFraction, PropertyID.PID_InclusionAspectRatio]
+        self.myInputPropIDs = [PropertyID.PID_MatrixYoung, PropertyID.PID_MatrixPoisson, PropertyID.PID_InclusionYoung, PropertyID.PID_InclusionPoisson, PropertyID.PID_InclusionVolumeFraction, PropertyID.PID_InclusionAspectRatio, PropertyID.PID_Density]
         # list of compulsory IDs
         self.myCompulsoryPropIDs = self.myInputPropIDs
 
         #list of recognized output property IDs
-        self.myOutPropIDs =  [PropertyID.PID_CriticalLoadLevel, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
+        self.myOutPropIDs =  [PropertyID.PID_Mass, PropertyID.PID_CriticalLoadLevel, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
 
         #dictionary of input properties (values)
         self.myInputProps = {}
@@ -165,6 +167,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
             self.digimatSolver.setProperty(self.myInputProps[PropertyID.PID_InclusionPoisson])
             self.digimatSolver.setProperty(self.myInputProps[PropertyID.PID_InclusionVolumeFraction])
             self.digimatSolver.setProperty(self.myInputProps[PropertyID.PID_InclusionAspectRatio])
+            
         except Exception as err:
             print ("Setting Digimat params failed: " + repr(err));
             self.terminate()
@@ -186,6 +189,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
             compositeInPlanePoisson = self.digimatSolver.getProperty(PropertyID.PID_CompositeInPlanePoisson)
             self.myOutProps[PropertyID.PID_CompositeTransversePoisson] = self.digimatSolver.getProperty(PropertyID.PID_CompositeTransversePoisson)
             compositeTransversePoisson = self.digimatSolver.getProperty(PropertyID.PID_CompositeTransversePoisson)
+            
             
         except Exception as err:
             print ("Error:" + repr(err))
@@ -224,7 +228,7 @@ class Airbus_Workflow_2(Workflow.Workflow):
             self.mul2Solver.setProperty(compositeInPlanePoisson)          
             self.mul2Solver.setProperty(compositeTransversePoisson1)
             self.mul2Solver.setProperty(compositeTransversePoisson2)
-            
+            self.mul2Solver.setProperty(self.myInputProps[PropertyID.PID_Density])
             
         except Exception as err:
             print ("Setting MUL2 params failed: " + repr(err));
@@ -236,6 +240,8 @@ class Airbus_Workflow_2(Workflow.Workflow):
             self.mul2Solver.solveStep(None)
             ## get the desired properties
             self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.mul2Solver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            self.myOutProps[PropertyID.PID_Mass] = self.mul2Solver.getProperty(PropertyID.PID_Mass, 0.0)
+ 
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -293,7 +299,8 @@ def workflow(inputGUID, execGUID):
         inclusionPoisson = 0.1
         inclusionVolumeFraction = 0.5
         inclusionAspectRatio = 1
-        
+        rho = 1.58e-9
+
         try:
             workflow = Airbus_Workflow_2()
             workflowMD = {
@@ -311,7 +318,7 @@ def workflow(inputGUID, execGUID):
             workflow.setProperty(Property.ConstantProperty(inclusionPoisson, PropertyID.PID_InclusionPoisson,          ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionVolumeFraction, PropertyID.PID_InclusionVolumeFraction,   ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionAspectRatio, PropertyID.PID_InclusionAspectRatio,      ValueType.Scalar, "none"))
-            
+            workflow.setProperty(Property.ConstantProperty(rho, PropertyID.PID_Density, ValueType.Scalar, 'ton/mm**3'))               
             # solve workflow
             workflow.solve()
             
@@ -328,8 +335,8 @@ def workflow(inputGUID, execGUID):
             
             # collect MUL2 outputs
             #KPI 1-1 weight
-            #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
-            #log.info("Requested KPI : Weight: " + str(weight) + ' kg')
+            weight = workflow.getProperty(PropertyID.PID_Mass, time).inUnitsOf('kg').getValue()
+            log.info("Requested KPI : Weight: " + str(weight) + ' kg')
             #KPI 1-2 buckling load
             bucklingLoad = workflow.getProperty(PropertyID.PID_CriticalLoadLevel, time).inUnitsOf('N').getValue()
             log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')
