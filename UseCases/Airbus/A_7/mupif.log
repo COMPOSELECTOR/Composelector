@@ -1,0 +1,46 @@
+2020-05-06 09:35:11 INFO:A_7.py:38 Setting Workflow basic metadata 
+
+2020-05-06 09:35:11 DEBUG:PyroUtil.py:176 Can connect to a LISTENING port of nameserver on 172.30.0.1:9090 
+
+2020-05-06 09:35:11 DEBUG:PyroUtil.py:188 Connected to NameServer on 172.30.0.1:9090. Pyro4 version on your localhost is 4.80 
+
+2020-05-06 09:35:11 INFO:PyroUtil.py:556 Located Job Manager ESI_VPS_Jobmanager_MUPIF_v2.2 at: 172.30.0.91 44383 None None 
+
+2020-05-06 09:35:11 DEBUG:PyroUtil.py:252 Application ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_9672a994ca534e30914cd0fbebfb0235@172.30.0.91:44383 on ('172.30.0.91', 44383, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f4d121c24e0; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-05-06 09:35:11 INFO:PyroUtil.py:260 Connecting to application ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f4d121c29e8; not connected; for PYRO:obj_9672a994ca534e30914cd0fbebfb0235@172.30.0.91:44383> 
+
+2020-05-06 09:35:11 DEBUG:PyroUtil.py:262 Connected to Mupif.JobManager.SimpleJobManager2 with the application ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-05-06 09:35:11 DEBUG:PyroUtil.py:597 Trying to connect to JobManager 
+
+2020-05-06 09:35:12 INFO:PyroUtil.py:615 Allocated job, returned record from jobManager:(1, '6@ESI_VPS_Jobmanager_MUPIF_v2.2', 9005) 
+
+2020-05-06 09:35:12 INFO:PyroUtil.py:638 Scenario: Connecting to 6@ESI_VPS_Jobmanager_MUPIF_v2.2 9005 
+
+2020-05-06 09:35:12 DEBUG:PyroUtil.py:252 Application 6@ESI_VPS_Jobmanager_MUPIF_v2.2, found URI PYRO:obj_0ffea039722046e383939d5a897b74e1@172.30.0.91:9005 on ('172.30.0.91', 9005, 'None', 'None') from a nameServer <Pyro4.core.Proxy at 0x7f4d121c24e0; connected IPv4; for PYRO:Pyro.NameServer@172.30.0.1:9090> 
+
+2020-05-06 09:35:12 INFO:PyroUtil.py:260 Connecting to application 6@ESI_VPS_Jobmanager_MUPIF_v2.2 with <Pyro4.core.Proxy at 0x7f4d121d8860; not connected; for PYRO:obj_0ffea039722046e383939d5a897b74e1@172.30.0.91:9005> 
+
+2020-05-06 09:35:12 DEBUG:PyroUtil.py:262 Connected to ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) with the application 6@ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-05-06 09:35:12 INFO:A_7.py:120 Created VPS job 
+
+2020-05-06 09:35:12 INFO:A_7.py:126 Working VPS solver on server ESI VPS COMPOSELECTOR Workstation in Stuttgart (Germany) 
+
+2020-05-06 09:35:12 INFO:A_7.py:299 Setting Execution Metadata of Vps 
+
+2020-05-06 09:35:13 DEBUG:Workflow.py:131 Step 1: t=1 dt=1 
+
+2020-05-06 09:35:14 INFO:A_7.py:185 Running Vps 
+
+2020-05-06 09:39:03 INFO:Model.py:558 RemoteApplication: Terminating jobManager job 6@ESI_VPS_Jobmanager_MUPIF_v2.2 on ESI_VPS_Jobmanager_MUPIF_v2.2 
+
+2020-05-06 09:39:04 INFO:Model.py:496 Terminating model 
+
+2020-05-06 09:39:04 INFO:A_7.py:312 Requested KPI : Buckling Load: 18004.56202883819 kN*mm 
+
+2020-05-06 09:39:04 INFO:Model.py:496 Terminating model 
+
+2020-05-06 09:39:04 INFO:A_7.py:315 Process complete 
+
