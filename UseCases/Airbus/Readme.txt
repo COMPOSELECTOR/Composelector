@@ -6,9 +6,9 @@ A_3  - Lammps -> Digimat-> MUL2                 	working
 A_4  - Abaqus                                   	working
 A_5  - Digimat -> Abaqus                        	working
 A_6  - Lammps -> Digimat -> Abaqus              	working
-A_7  - DB -> VPS                               		not working		
-A_8  - Digimat -> VPS                          		not working		
-A_9  - Lammps -> Digimat -> VPS                		not working		
+A_7  - DB -> VPS                               		working		
+A_8  - Digimat -> VPS                          		working		
+A_9  - Lammps -> Digimat -> VPS                		working		
 
 
 Process workflows(including fibre orientation)
