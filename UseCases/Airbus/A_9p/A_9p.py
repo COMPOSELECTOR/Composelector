@@ -6,7 +6,9 @@ import logging
 log = logging.getLogger()
 import time as timeT
 import mupif.Physics.PhysicalQuantities as PQ
+import numpy as np
 
+from copy import deepcopy
 debug = True
 
 
@@ -27,7 +29,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
 
     def __init__(self, metaData={}):
         """
-        Initializes the workflow. As the workflow is non-stationary, we allocate individual 
+        Initializes the workflow. As the workflow is non-stationary, we allocate individual
         applications and store them within a class.
         """
         log.info('Setting Workflow basic metadata')
@@ -69,7 +71,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         }
 
         super(Airbus_Workflow_9p, self).__init__(metaData=MD)
-        self.updateMetadata(metaData)        
+        self.updateMetadata(metaData)
 
         #list of recognized input porperty IDs
         self.myInputPropIDs = [PropertyID.PID_MatrixYoung, PropertyID.PID_MatrixPoisson, PropertyID.PID_InclusionYoung, PropertyID.PID_InclusionPoisson, PropertyID.PID_InclusionVolumeFraction, PropertyID.PID_InclusionAspectRatio]
@@ -88,7 +90,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         self.digimatSolver = None
         self.comsolSolver = None
         self.vpsSolver = None
-        
+
 
 
     def initialize(self, file='', workdir='', targetTime=PQ.PhysicalQuantity(1., 's'), metaData={}, validateMetaData=True, **kwargs):
@@ -103,7 +105,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         self.comsolJobMan = PyroUtil.connectJobManager(ns, comsolJobManName,hkey)
 
 
-        
+
         #allocate the Digimat remote instance
         try:
             self.digimatSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.digimatJobMan, None, hkey)
@@ -111,7 +113,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             self.comsolSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.comsolJobMan, None, hkey)
             log.info('Created comsol job')
             self.vpsSolver = PyroUtil.allocateApplicationWithJobManager( ns, self.vpsJobMan, None, hkey)
-            log.info('Created Vps job')            
+            log.info('Created Vps job')
         except Exception as e:
             log.exception(e)
         else:
@@ -140,16 +142,18 @@ class Airbus_Workflow_9p(Workflow.Workflow):
 
 
         log.info('Setting Execution Metadata of Digimat')
-        # initialize digimat solver        
+        # initialize digimat solver
         self.digimatSolver.initialize(metaData=passingMD)
         # initialize comsol solver
         log.info('Setting Execution Metadata of comsol')
         self.comsolSolver.initialize(metaData=passingMD)
         # initialize vps solver
         log.info('Setting Execution Metadata of Vps')
-        self.vpsSolver.initialize(metaData=passingMD)
+        workdir=self.vpsJobMan.getJobWorkDir(self.vpsSolver.getJobID())
+        self.vpsSolver.initialize(metaData=passingMD,workdir=workdir)
+        self.vpsSolver.readInput()
 
-                
+
 
     def setProperty(self, property, objectID=0):
         propID = property.getPropertyID()
@@ -162,13 +166,13 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         if (propID in self.myOutPropIDs):
             return self.myOutProps[propID]
         else:
-            raise APIError.APIError ('Unknown property ID', propID)   
+            raise APIError.APIError ('Unknown property ID', propID)
 
     def solveStep(self, istep, stageID=0, runInBackground=False):
 
         for cID in self.myCompulsoryPropIDs:
             if cID not in self.myInputProps:
-                raise APIError.APIError (self.getApplicationSignature(), ' Missing compulsory property ', cID)   
+                raise APIError.APIError (self.getApplicationSignature(), ' Missing compulsory property ', cID)
 
         # digimat
         try:
@@ -200,7 +204,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             compositeInPlanePoisson = self.digimatSolver.getProperty(PropertyID.PID_CompositeInPlanePoisson)
             self.myOutProps[PropertyID.PID_CompositeTransversePoisson] = self.digimatSolver.getProperty(PropertyID.PID_CompositeTransversePoisson)
             compositeTransversePoisson = self.digimatSolver.getProperty(PropertyID.PID_CompositeTransversePoisson)
-            
+
         except Exception as err:
             print ("Error:" + repr(err))
             self.terminate()
@@ -212,76 +216,105 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             self.comsolSolver.solveStep(None)
             ## get the desired properties
             # get domain number to filter tooling
-            self.domainNumber = self.comsolSolver.getField(FieldID.FID_DomainNumber,0,0)
+            domainNumber = self.comsolSolver.getField(FieldID.FID_DomainNumber,0,0)
             ## get fibre orientation for four different layers, already on filtered domain (no toling)
             #self.fibreOrientation0 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1), self.domainNumber, 1.0)
             #self.fibreOrientation90 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,2), self.domainNumber, 1.0)
             #self.fibreOrientation45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,3), self.domainNumber, 1.0)
             # - 45
             #self.fibreOrientation_45 = filterField(self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,4), self.domainNumber, 1.0)
-            fibreOrientation0 = self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1)
-            print(fibreOrientation0)
-        except Exception as err:
-            print ("Error:" + repr(err))
-            self.terminate()    
 
-            
+            INSA_fibre0  = self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,1)
+            INSA_fibre90 = self.comsolSolver.getField(FieldID.FID_FibreOrientation,0,2)
+            INSA_disp   = self.comsolSolver.getField(FieldID.FID_Displacement,0,1)
+
+            print('Filter ori 0')
+            self.fibreOrientation0  = INSAoriextract(INSA_fibre0,INSA_disp,domainNumber)
+            print('Filter ori 90')
+            self.fibreOrientation90 = INSAoriextract(INSA_fibre90,INSA_disp,domainNumber)
+
+            #print(self.fibreOrientation0)
+        except Exception as err:
+            print ("Error COMSOL:" + repr(err))
+            self.terminate()
 
         try:
+            log.info("Map properties from Digimat to properties of Vps")
             # map properties from Digimat to properties of Vps
             # Young modulus
-            compositeAxialYoung.propID = PropertyID.PID_YoungModulus1
-            compositeInPlaneYoung1 = compositeInPlaneYoung
-            compositeInPlaneYoung1.propID = PropertyID.PID_YoungModulus2
-            compositeInPlaneYoung2 = compositeInPlaneYoung
-            compositeInPlaneYoung2.propID = PropertyID.PID_YoungModulus3
+            ESI_VPS_PLY1_E0t1 = deepcopy(compositeAxialYoung)
+            ESI_VPS_PLY1_E0t1.propID = PropertyID.PID_ESI_VPS_PLY1_E0t1
+
+            ESI_VPS_PLY1_E0c1 = deepcopy(compositeAxialYoung)
+            ESI_VPS_PLY1_E0c1.propID = PropertyID.PID_ESI_VPS_PLY1_E0c1
+
+            ESI_VPS_PLY1_E0t2 = deepcopy(compositeInPlaneYoung)
+            ESI_VPS_PLY1_E0t2.propID = PropertyID.PID_ESI_VPS_PLY1_E0t2
+
+            ESI_VPS_PLY1_E0t3 = deepcopy(compositeInPlaneYoung)
+            ESI_VPS_PLY1_E0t3.propID = PropertyID.PID_ESI_VPS_PLY1_E0t3
+
             # Shear modulus
-            compositeInPlaneShear.propID = PropertyID.PID_ShearModulus12
-            compositeTransverseShear1 = compositeTransverseShear
-            compositeTransverseShear1.propID = PropertyID.PID_ShearModulus13
-            compositeTransverseShear2 = compositeTransverseShear
-            compositeTransverseShear2.propID = PropertyID.PID_ShearModulus23
+            ESI_VPS_PLY1_G012 = deepcopy(compositeInPlaneShear)
+            ESI_VPS_PLY1_G012.propID = PropertyID.PID_ESI_VPS_PLY1_G012
+
+            ESI_VPS_PLY1_G013 = deepcopy(compositeInPlaneShear)
+            ESI_VPS_PLY1_G013.propID = PropertyID.PID_ESI_VPS_PLY1_G013
+
+            ESI_VPS_PLY1_G023 = deepcopy(compositeTransverseShear)
+            ESI_VPS_PLY1_G023.propID = PropertyID.PID_ESI_VPS_PLY1_G023
+
             # Poisson ratio
-            compositeInPlanePoisson.propID =  PropertyID.PID_PoissonRatio12
-            compositeTransversePoisson1 =  compositeTransversePoisson
-            compositeTransversePoisson1.propID = PropertyID.PID_PoissonRatio13
-            compositeTransversePoisson2 =  compositeTransversePoisson
-            compositeTransversePoisson2.propID = PropertyID.PID_PoissonRatio23
-            
-            #self.vpsSolver.setProperty(compositeAxialYoung)
-            #self.vpsSolver.setProperty(compositeInPlaneYoung1)
-            #self.vpsSolver.setProperty(compositeInPlaneYoung2)
-            
-            #self.vpsSolver.setProperty(compositeInPlaneShear)          
-            #self.vpsSolver.setProperty(compositeTransverseShear1)
-            #self.vpsSolver.setProperty(compositeTransverseShear2)
-            
-            #self.vpsSolver.setProperty(compositeInPlanePoisson)          
-            #self.vpsSolver.setProperty(compositeTransversePoisson1)
-            #self.vpsSolver.setProperty(compositeTransversePoisson2)
-            
+            ESI_VPS_PLY1_NU12 = deepcopy(compositeInPlanePoisson)
+            ESI_VPS_PLY1_NU12.propID = PropertyID.PID_ESI_VPS_PLY1_NU12
+
+            ESI_VPS_PLY1_NU13 = deepcopy(compositeInPlanePoisson)
+            ESI_VPS_PLY1_NU13.propID = PropertyID.PID_ESI_VPS_PLY1_NU13
+
+            ESI_VPS_PLY1_NU23 = deepcopy(compositeTransversePoisson)
+            ESI_VPS_PLY1_NU23.propID = PropertyID.PID_ESI_VPS_PLY1_NU23
+
+
+            # Assign properties
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_E0t1)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_E0t2)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_E0t3)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_E0c1)
+
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_G012)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_G013)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_G023)
+
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_NU12)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_NU13)
+            self.vpsSolver.setProperty(ESI_VPS_PLY1_NU23)
+
 
             # set the field orientation, the objectID corresponds to layer angle, i.e, 0,90,45,-45
-            #self.vpsSolver.setField(self.fibreOrientation0,FieldID.FID_FibreOrientation,0,0)
+            print('Set ori 0')
+            self.vpsSolver.setField(self.fibreOrientation0,angle = 0.0)
+            print('Set ori 90')
+            self.vpsSolver.setField(self.fibreOrientation90,angle = 90.0)
             #self.vpsSolver.setField(self.fibreOrientation90,FieldID.FID_FibreOrientation,0,90)
             #self.vpsSolver.setField(self.fibreOrientation45,FieldID.FID_FibreOrientation,0,45)
             #self.vpsSolver.setField(self.fibreOrientation_45,FieldID.FID_FibreOrientation,0,-45)
 
-            
+
         except Exception as err:
             print ("Setting Vps params failed: " + repr(err));
             self.terminate()
-            
+
         try:
-            # solve digimat part
+            # solve vps model
             log.info("Running Vps")
-            #self.vpsSolver.solveStep(None)
+            self.vpsSolver.solveStep(None)
             ## get the desired properties
             #self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.vpsSolver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
             log.info("Done")
         except Exception as err:
-            print ("Error:" + repr(err))
+            print ("Error VPS:" + repr(err))
             self.terminate()
+
 
     def filterField(sourceField, filterField, tresholdValue):
         # filter composite part
@@ -294,7 +327,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         targetCells = []
         targetVertices = []
         nodeMap = [-1] * fmesh.getNumberOfVertices()
-        
+
         fvalues = []
         for iv in fmesh.vertices():
             n = iv.getNumber()
@@ -304,7 +337,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
                 nodeMap[n] = nn.number
                 targetVertices.append(nn)
                 fvalues.append(sourceField.getVertexValue(n).getValue())
-                
+
         for icell in fmesh.cellsq():
             # determine if icell belongs to composite domain
             if (nodeMap[icell.getVertices()[0].getNumber()] >= 0):
@@ -325,7 +358,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
                               fieldType=sourceField.getFieldType(), objectID=sourceField.getObjectID())
         return targetField
 
-            
+
 
 
     def getCriticalTimeStep(self):
@@ -345,6 +378,60 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         return "1.0"
 
 
+def INSAoriextract(srcfield, dispfield, domainfield):
+
+    mesh = srcfield.getMesh()
+
+    boundingbox = np.zeros([3,2])
+    boundingbox[:,0] =  1e12
+    boundingbox[:,1] = -1e12
+
+    vertexsrclist = {}
+    vertexlist    = []
+    celllist      = []
+
+
+    trgmesh = Mesh.UnstructuredMesh()
+
+    node_num = 0
+
+    for ii, vertex in enumerate(mesh.vertexList, 0):
+        vertid = vertex.number
+
+        domainid = domainfield.getVertexValue(vertid).value[0]
+        if domainid==1.0:
+            coord = mesh.getVertex(vertid).coords + dispfield.getVertexValue(vertid).value
+            coord *= 1000.0  # m to mm
+            ori   = srcfield.getVertexValue(vertid).value
+            vertexsrclist[vertid] = dict(MUPIF_ID = node_num, ori = deepcopy(ori))
+            vertexlist.append(Vertex.Vertex(node_num, node_num, coord))
+            node_num += 1
+
+    for ii, element in enumerate(mesh.cellList, 0):
+        vertices = element.getVertices()
+        connect = []
+        isindomain = True
+        for vert in vertices:
+            if not (vert.number) in vertexsrclist:
+                isindomain = False
+                break
+            vertexsrclist
+            connect.append(vertexsrclist[vert.number]['MUPIF_ID'])
+
+        if isindomain:
+            celllist.append(Cell.Tetrahedron_3d_lin(trgmesh, ii, ii, connect))
+
+    trgmesh.setup(vertexlist, celllist)
+
+    orifield = Field.Field(trgmesh,FieldID.FID_FibreOrientation,ValueType.Vector,srcfield.getUnits(), srcfield.getTime(),None,1)
+
+    for ii, vertid in enumerate(vertexsrclist, 0):
+        orifield.setValue(vertexsrclist[vertid]['MUPIF_ID'], vertexsrclist[vertid]['ori'])
+
+    orifield.updateMetadata(srcfield.getAllMetadata())
+
+    return orifield
+
 def workflow(inputGUID, execGUID):
     # Define execution details to export
     if not debug:
@@ -361,17 +448,17 @@ def workflow(inputGUID, execGUID):
                       "Inclusion volume fraction": "%",
                       "Inclusion aspect ratio": ""
         }
-        
+
         # Export data from database
         ExportedData = miu.ExportData("MI_Composelector", "Inputs-Outputs", inputGUID, propsToExp, miu.unitSystems.METRIC)
-        
+
         matrixYoung = ExportedData["Matrix Young's modulus"]
         matrixPoisson = ExportedData["Matrix Poisson's ratio"]
         inclusionYoung = ExportedData["Inclusion Young's modulus"]
         inclusionPoisson = ExportedData["Inclusion Poisson's ratio"]
         inclusionVolumeFraction = ExportedData["Inclusion volume fraction"]
         inclusionAspectRatio = ExportedData["Inclusion aspect ratio"]
-        
+
     else:
         matrixYoung = 10
         matrixPoisson = 0.2
@@ -379,7 +466,7 @@ def workflow(inputGUID, execGUID):
         inclusionPoisson = 0.1
         inclusionVolumeFraction = 0.5
         inclusionAspectRatio = 1
-        
+
         try:
             workflow = Airbus_Workflow_9p()
             workflowMD = {
@@ -398,13 +485,13 @@ def workflow(inputGUID, execGUID):
             workflow.setProperty(Property.ConstantProperty(inclusionVolumeFraction, PropertyID.PID_InclusionVolumeFraction,   ValueType.Scalar, "none"))
             workflow.setProperty(Property.ConstantProperty(inclusionAspectRatio, PropertyID.PID_InclusionAspectRatio,      ValueType.Scalar, "none"))
 
-                      
+
             # solve workflow
             workflow.solve()
-            
+
             # get workflow outputs
             time = PQ.PhysicalQuantity(1.0, 's')
-            
+
             # collect Digimat outputs
             #compositeAxialYoung = workflow.getProperty(PropertyID.PID_CompositeAxialYoung,time).inUnitsOf('MPa').getValue()
             #compositeInPlaneYoung = workflow.getProperty(PropertyID.PID_CompositeInPlaneYoung,time).inUnitsOf('MPa').getValue()
@@ -412,7 +499,7 @@ def workflow(inputGUID, execGUID):
             #compositeTransverseShear = workflow.getProperty(PropertyID.PID_CompositeTransverseShear,time).inUnitsOf('MPa').getValue()
             #compositeInPlanePoisson = workflow.getProperty(PropertyID.PID_CompositeInPlanePoisson,time).getValue()
             #compositeTransversePoisson = workflow.getProperty(PropertyID.PID_CompositeTransversePoisson,time).getValue()
-            
+
             # collect Vps outputs
             #KPI 1-1 weight
             #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
@@ -422,7 +509,7 @@ def workflow(inputGUID, execGUID):
             #log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')
             workflow.terminate()
             log.info("Process complete")
-            
+
             if not debug:
                 # Importing output to database
                 ImportHelper = miu.Importer("MI_Composelector", "Inputs-Outputs", ["Inputs/Outputs"])
@@ -435,13 +522,54 @@ def workflow(inputGUID, execGUID):
                 ImportHelper.CreateAttribute("Transverse Poisson's ratio", compositeTransversePoisson, "")
                 ImportHelper.CreateAttribute("Buckling Load", bucklingLoad, "N")
                 return ImportHelper
-            
+
         except APIError.APIError as err:
             print ("Mupif API for Airubu_Workflow_9p: " + repr(err))
         except Exception as err:
             print ("Error: " + repr(err))
         except:
             print ("Unknown error.")
-            
+
+    return workflow
+
 if __name__=='__main__':
-    workflow(0,0)
+    model = workflow(0,0)
+
+    srcfield    = model.fibreOrientation0
+    #dispfield   = model.INSA_disp
+    #domainfield = model.domainNumber
+
+    mesh = srcfield.getMesh()
+
+    nverts = mesh.getNumberOfVertices()
+
+    src_coord = np.zeros([nverts,3])
+    src_res   = np.zeros([nverts,3])
+
+    boundingbox = np.zeros([3,2])
+    boundingbox[:,0] =  1e12
+    boundingbox[:,1] = -1e12
+
+    model_pc    = {}
+    nodes    = {}
+    elements = {}
+
+    for ii, vertex in enumerate(mesh.vertexList, 0):
+        vertid = vertex.number
+        coord = mesh.getVertex(vertid).coords
+        ori   = srcfield.getVertexValue(vertid).value
+        nodes[vertid+1] = dict(coord=deepcopy(coord),ori = deepcopy(ori))
+
+    for ii, element in enumerate(mesh.cellList, 0):
+        vertices = element.getVertices()
+        connect = []
+        isindomain = True
+        for vert in vertices:
+            connect.append(vert.number + 1)
+
+        if isindomain:
+            elements[ii+1] = dict(idprt=1,elementtype = 'TETR4',
+                                   connectivity = connect)
+
+    model_pc['nodes']    = nodes
+    model_pc['elements'] = elements
