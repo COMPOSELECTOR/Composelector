@@ -17,7 +17,7 @@ A_5p  - Digimat + Comsol -> Abaqus                      not working
 A_6p  - Lammps -> Digimat + Comsol -> Abaqus            not working		
 A_7p  - DB + Comsol -> VPS                              not working		
 A_8p  - Digimat + Comsol -> VPS                         not working		
-A_9p  - Lammps -> Digimat + Comsol -> VPS               not working		
+A_9p  - Lammps -> Digimat + Comsol -> VPS               working		
 
 
 
