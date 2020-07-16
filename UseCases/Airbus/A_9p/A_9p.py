@@ -79,7 +79,7 @@ class Airbus_Workflow_9p(Workflow.Workflow):
         self.myCompulsoryPropIDs = self.myInputPropIDs
 
         #list of recognized output property IDs
-        self.myOutPropIDs =  [PropertyID.PID_CriticalLoadLevel, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
+        self.myOutPropIDs =  [PropertyID.PID_ESI_VPS_BUCKL_LOAD, PropertyID.PID_ESI_VPS_TOTAL_MODEL_MASS, PropertyID.PID_CompositeAxialYoung, PropertyID.PID_CompositeInPlaneYoung, PropertyID.PID_CompositeInPlaneShear, PropertyID.PID_CompositeTransverseShear, PropertyID.PID_CompositeInPlanePoisson, PropertyID.PID_CompositeTransversePoisson]
 
         #dictionary of input properties (values)
         self.myInputProps = {}
@@ -293,8 +293,11 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             # set the field orientation, the objectID corresponds to layer angle, i.e, 0,90,45,-45
             print('Set ori 0')
             self.vpsSolver.setField(self.fibreOrientation0,angle = 0.0)
-            print('Set ori 90')
-            self.vpsSolver.setField(self.fibreOrientation90,angle = 90.0)
+            #self.fibreOrientation0.toVTK2('f0')
+            #print('Set ori 90')
+            #self.fibreOrientation90.toVTK2('f90')
+            #self.vpsSolver.setField(self.fibreOrientation90,angle = 90.0)
+
             #self.vpsSolver.setField(self.fibreOrientation90,FieldID.FID_FibreOrientation,0,90)
             #self.vpsSolver.setField(self.fibreOrientation45,FieldID.FID_FibreOrientation,0,45)
             #self.vpsSolver.setField(self.fibreOrientation_45,FieldID.FID_FibreOrientation,0,-45)
@@ -309,7 +312,10 @@ class Airbus_Workflow_9p(Workflow.Workflow):
             log.info("Running Vps")
             self.vpsSolver.solveStep(None)
             ## get the desired properties
-            #self.myOutProps[PropertyID.PID_CriticalLoadLevel] = self.vpsSolver.getProperty(PropertyID.PID_CriticalLoadLevel,0)
+            self.myOutProps[PropertyID.PID_ESI_VPS_BUCKL_LOAD] = self.vpsSolver.getProperty(PropertyID.PID_ESI_VPS_BUCKL_LOAD,0)
+            self.myOutProps[PropertyID.PID_ESI_VPS_TOTAL_MODEL_MASS] = self.vpsSolver.getProperty(PropertyID.PID_ESI_VPS_TOTAL_MODEL_MASS,0)
+
+            
             log.info("Done")
         except Exception as err:
             print ("Error VPS:" + repr(err))
@@ -505,8 +511,10 @@ def workflow(inputGUID, execGUID):
             #weight = workflow.getProperty(PropertyID.PID_Weight, time).inUnitsOf('kg').getValue()
             #log.info("Requested KPI : Weight: " + str(weight) + ' kg')
             #KPI 1-2 buckling load
-            #bucklingLoad = workflow.getProperty(PropertyID.PID_CriticalLoadLevel, time).inUnitsOf('N').getValue()
-            #log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N')
+            bucklingLoad = workflow.getProperty(PropertyID.PID_ESI_VPS_BUCKL_LOAD, time).inUnitsOf('N*mm').getValue()
+            log.info("Requested KPI : Buckling Load: " + str(bucklingLoad) + ' N*mm')
+            mass = workflow.getProperty(PropertyID.PID_ESI_VPS_TOTAL_MODEL_MASS, time).inUnitsOf('kg').getValue()
+            log.info("Requested KPI : Mass: " + str(mass) + ' kg')
             workflow.terminate()
             log.info("Process complete")
 
@@ -520,7 +528,7 @@ def workflow(inputGUID, execGUID):
                 ImportHelper.CreateAttribute("Transverse shear modulus", compositeTransverseShear, "MPa")
                 ImportHelper.CreateAttribute("In-plane Poisson's ratio", compositeInPlanePoisson, "")
                 ImportHelper.CreateAttribute("Transverse Poisson's ratio", compositeTransversePoisson, "")
-                ImportHelper.CreateAttribute("Buckling Load", bucklingLoad, "N")
+                ImportHelper.CreateAttribute("Buckling Load", bucklingLoad, "N*mm")
                 return ImportHelper
 
         except APIError.APIError as err:
